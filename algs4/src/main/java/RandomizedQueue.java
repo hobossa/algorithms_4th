@@ -1,6 +1,25 @@
 import java.util.Iterator;
 
 public class RandomizedQueue<Item> implements Iterable<Item> {
+    // nested class RandomizedQueueIterator
+    private static class RandomizedQueueIterator<Item> implements Iterator<Item> {
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Item next() {
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+    }
+
     private int size = 0;
 
     // construct an empty randomized queue
