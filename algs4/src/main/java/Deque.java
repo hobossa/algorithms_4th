@@ -70,8 +70,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
     } // -------- end of nested class DequeIterator --------
 
-    private Node<Item> head;
-    private Node<Item> tail;
+    private final Node<Item> head;
+    private final Node<Item> tail;
     private int size;
 
     // construct an empty deque
@@ -98,7 +98,7 @@ public class Deque<Item> implements Iterable<Item> {
             throw new IllegalArgumentException("item is null");
         }
         Node<Item> newNode = new Node<>(item, null, null);
-        insertNodeBetween(newNode, head, head.next);
+        insertNodeBetween(newNode, head, head.getNext());
     }
 
     // add the item to the back
@@ -107,7 +107,7 @@ public class Deque<Item> implements Iterable<Item> {
             throw new IllegalArgumentException("item is null");
         }
         Node<Item> newNode = new Node<>(item, null, null);
-        insertNodeBetween(newNode, tail.prev, tail);
+        insertNodeBetween(newNode, tail.getPrev(), tail);
     }
 
     // remove and return the item from the front
@@ -115,7 +115,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException("Dequeue is empty.");
         }
-        return removeNodeBetween(head.getNext(), head, head.getNext().getNext());
+        return removeNode(head.getNext());
     }
 
     // remove and return the item from the back
@@ -123,7 +123,7 @@ public class Deque<Item> implements Iterable<Item> {
         if (isEmpty()) {
             throw new NoSuchElementException("Dequeue is empty.");
         }
-        return removeNodeBetween(tail.getPrev(), tail.getPrev().getPrev(), tail);
+        return removeNode(tail.getPrev());
     }
 
     // return an iterator over items in order from front to back
@@ -139,11 +139,12 @@ public class Deque<Item> implements Iterable<Item> {
         size++;
     }
 
-    private Item removeNodeBetween(Node<Item> node, Node<Item> prevNode, Node<Item> nextNode) {
+    private Item removeNode(Node<Item> node) {
         Item item = node.getItem();
-        node = null;
-        prevNode.setNext(nextNode);
-        nextNode.setPrev(prevNode);
+        Node<Item> prev = node.getPrev();
+        Node<Item> next = node.getNext();
+        prev.setNext(next);
+        next.setPrev(prev);
         size--;
         return item;
     }

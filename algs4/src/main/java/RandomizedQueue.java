@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 public class RandomizedQueue<Item> implements Iterable<Item> {
     // -------- nested class RandomizedQueueIterator --------
     private class RandomizedQueueIterator implements Iterator<Item> {
-        private int[] randomIndices;
+        private final int[] randomIndices;
         private int current;
 
         public RandomizedQueueIterator() {
@@ -49,7 +49,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
     private int size;
 
     // construct an empty randomized queue
-    @SuppressWarnings("unchecked")
     public RandomizedQueue() {
         data = (Item[]) new Object[MINI_CAPACITY];
         head = 0;
@@ -68,6 +67,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // add the item
     public void enqueue(Item item) {
+        if (null == item) {
+            throw new IllegalArgumentException("item is null");
+        }
         resizeWhenNeeded();
         data[(head + size) % data.length] = item;
         size++;
@@ -75,6 +77,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // remove and return a random item
     public Item dequeue() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("Queue is empty.");
+        }
         int r = StdRandom.uniform(size);
         swap(head, (head + r) % data.length);
         Item temp = data[head];
@@ -87,6 +92,9 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
 
     // return a random item (but do not remove it)
     public Item sample() {
+        if (isEmpty()) {
+            throw new NoSuchElementException("Queue is empty.");
+        }
         int r = StdRandom.uniform(size);
         return data[(head + r) % data.length];
     }
@@ -96,7 +104,6 @@ public class RandomizedQueue<Item> implements Iterable<Item> {
         return new RandomizedQueueIterator();
     }
 
-    @SuppressWarnings("unchecked")
     private void resizeWhenNeeded() {
         int newCapacity = 0;
         if (size == data.length) {
