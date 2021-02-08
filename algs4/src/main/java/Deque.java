@@ -1,5 +1,3 @@
-import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.StdDraw;
 import edu.princeton.cs.algs4.StdOut;
 
 import java.util.Iterator;
@@ -47,8 +45,8 @@ public class Deque<Item> implements Iterable<Item> {
     private class DequeIterator implements Iterator<Item> {
         private Node<Item> current;
 
-        public DequeIterator(Node<Item> current) {
-            this.current = current;
+        public DequeIterator() {
+            this.current = head;
         }
 
         @Override
@@ -72,8 +70,8 @@ public class Deque<Item> implements Iterable<Item> {
         }
     } // -------- end of nested class DequeIterator --------
 
-    Node<Item> head;
-    Node<Item> tail;
+    private Node<Item> head;
+    private Node<Item> tail;
     private int size;
 
     // construct an empty deque
@@ -130,7 +128,7 @@ public class Deque<Item> implements Iterable<Item> {
 
     // return an iterator over items in order from front to back
     public Iterator<Item> iterator() {
-        return new DequeIterator(head);
+        return new DequeIterator();
     }
 
     private void insertNodeBetween(Node<Item> node, Node<Item> prevNode, Node<Item> nextNode) {
@@ -153,6 +151,12 @@ public class Deque<Item> implements Iterable<Item> {
     // unit testing (required)
     public static void main(String[] args) {
         Deque<Integer> deque = new Deque<>();
+        deque.addFirst(1);
+        StdOut.println("elements in Deque:");
+        for (Integer i : deque) {
+            StdOut.println("  " + i);
+        }
+        StdOut.println("removeLast: " + deque.removeLast());
         StdOut.println("isEmpty:" + deque.isEmpty());
         StdOut.println("size: " + deque.size());
         deque.addFirst(2);
