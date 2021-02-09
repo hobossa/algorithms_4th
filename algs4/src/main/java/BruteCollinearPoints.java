@@ -13,23 +13,26 @@ public class BruteCollinearPoints {
             validate(p);
         }
         // checks duplicate elements
-        Arrays.sort(points);
-        for (int i = 1; i < points.length; i++) {
-            if (points[i-1] == points[i]) {
+        Point[] pointsEx = new Point[points.length];
+        System.arraycopy(points, 0, pointsEx, 0, pointsEx.length);
+
+        Arrays.sort(pointsEx);
+        for (int i = 1; i < pointsEx.length; i++) {
+            if (pointsEx[i - 1] == pointsEx[i]) {
                 throw new IllegalArgumentException("contains a repeated point.");
             }
         }
         // finds segments
-        for (int i = 0; i < points.length; i++) {
-            for (int j = i + 1; j < points.length; j++) {
-                double slp1 = points[i].slopeTo(points[j]);
-                for (int k = j + 1; k < points.length; k++) {
-                    double slp2 = points[i].slopeTo(points[k]);
-                    if ( slp1 == slp2){
-                        for (int l = k + 1; l < points.length; l++) {
-                            double slp3 = points[i].slopeTo(points[l]);
+        for (int p = 0; p < pointsEx.length; p++) {
+            for (int q = p + 1; q < pointsEx.length; q++) {
+                double slp1 = pointsEx[p].slopeTo(pointsEx[q]);
+                for (int r = q + 1; r < pointsEx.length; r++) {
+                    double slp2 = pointsEx[p].slopeTo(pointsEx[r]);
+                    if (slp1 == slp2) {
+                        for (int s = r + 1; s < pointsEx.length; s++) {
+                            double slp3 = pointsEx[p].slopeTo(pointsEx[s]);
                             if (slp1 == slp3) {
-                                segments.add(new LineSegment(points[i], points[l]));
+                                segments.add(new LineSegment(pointsEx[p], pointsEx[s]));
                             }
                         }
                     }
@@ -47,14 +50,14 @@ public class BruteCollinearPoints {
     public LineSegment[] segments() {
         LineSegment[] array = new LineSegment[numberOfSegments()];
         int i = 0;
-        for (LineSegment line: segments) {
+        for (LineSegment line : segments) {
             array[i++] = line;
         }
         return array;
     }
 
-    private void validate(Object o) {
-        if (null == o) {
+    private void validate(Object obj) {
+        if (null == obj) {
             throw new IllegalArgumentException("null value");
         }
     }

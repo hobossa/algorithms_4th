@@ -14,21 +14,6 @@ import java.util.Comparator;
 
 public class Point implements Comparable<Point> {
 
-    private final Comparator<Point> comparatorBySlope = new Comparator<Point>() {
-        @Override
-        public int compare(Point o1, Point o2) {
-            double s1 = slopeTo(o1);
-            double s2 = slopeTo(o2);
-            if (s1 < s2) {
-                return -1;
-            }
-            if (s1 > s2) {
-                return 1;
-            }
-            return 0;
-        }
-    };
-
     private final int x;     // x-coordinate of this point
     private final int y;     // y-coordinate of this point
 
@@ -128,7 +113,20 @@ public class Point implements Comparable<Point> {
      * @return the Comparator that defines this ordering on points
      */
     public Comparator<Point> slopeOrder() {
-        return comparatorBySlope;
+        return new Comparator<Point>() {
+            @Override
+            public int compare(Point o1, Point o2) {
+                double s1 = slopeTo(o1);
+                double s2 = slopeTo(o2);
+                if (s1 < s2) {
+                    return -1;
+                }
+                if (s1 > s2) {
+                    return 1;
+                }
+                return 0;
+            }
+        };
     }
 
 

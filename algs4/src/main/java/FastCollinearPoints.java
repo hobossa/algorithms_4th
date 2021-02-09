@@ -33,20 +33,20 @@ public class FastCollinearPoints {
             // Sort
             Arrays.sort(auxiliaryPoints, 0, len, points[i].slopeOrder());
             // find elements with same slopTo point[i]
-            int l = 0;
-            int r = 0;
+            int m = 0;
+            int n = 0;
             for (int j = 1; j < len; j++) {
-                if (points[i].slopeTo(auxiliaryPoints[j]) == points[i].slopeTo(auxiliaryPoints[l])) {
-                    r = i;
+                if (points[i].slopeTo(auxiliaryPoints[j]) == points[i].slopeTo(auxiliaryPoints[m])) {
+                    n = i;
                 } else {
-                    l = i;
+                    m = i;
                 }
             }
-            // auxiliaryPoints[l..r] are collinear
-            if (r - l >= 2) {
+            // auxiliaryPoints[m..n] are collinear
+            if (n - m >= 2) {
                 // Arrays.sort sorts the array in place. So we point[i] is the smallest
                 // and the auxiliaryPoints[r] is the biggest.
-                segments.add(new LineSegment(points[i], auxiliaryPoints[r]));
+                segments.add(new LineSegment(points[i], auxiliaryPoints[n]));
             }
         }
 
@@ -61,14 +61,14 @@ public class FastCollinearPoints {
     public LineSegment[] segments() {
         LineSegment[] array = new LineSegment[numberOfSegments()];
         int i = 0;
-        for (LineSegment line: segments) {
+        for (LineSegment line : segments) {
             array[i++] = line;
         }
         return array;
     }
 
-    private void validate(Object o) {
-        if (null == o) {
+    private void validate(Object obj) {
+        if (null == obj) {
             throw new IllegalArgumentException("null value");
         }
     }
