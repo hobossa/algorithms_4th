@@ -13,30 +13,33 @@ public class FastCollinearPoints {
             validate(p);
         }
         // checks duplicate elements
-        Arrays.sort(points);
-        for (int i = 1; i < points.length; i++) {
-            if (points[i - 1] == points[i]) {
+        Point[] pointsEx = new Point[points.length];
+        System.arraycopy(points, 0, pointsEx, 0, pointsEx.length);
+
+        Arrays.sort(pointsEx);
+        for (int i = 1; i < pointsEx.length; i++) {
+            if (pointsEx[i - 1].compareTo(pointsEx[i]) == 0) {
                 throw new IllegalArgumentException("contains a repeated point.");
             }
         }
         // finds segments containing 4 or more points
-        Point[] auxiliaryPoints = new Point[points.length];
-        for (int i = 0; i < points.length; i++) {
+        Point[] auxiliaryPoints = new Point[pointsEx.length];
+        for (int i = 0; i < pointsEx.length; i++) {
             // copy point [i+1..points.length) to auxiliaryPoints
-            int len = points.length - i - 1;
+            int len = pointsEx.length - i - 1;
             if (len < 3) {
                 break;
             }
             for (int j = 0; j < len; j++) {
-                auxiliaryPoints[j] = points[i + 1 + j];
+                auxiliaryPoints[j] = pointsEx[i + 1 + j];
             }
             // Sort
-            Arrays.sort(auxiliaryPoints, 0, len, points[i].slopeOrder());
+            Arrays.sort(auxiliaryPoints, 0, len, pointsEx[i].slopeOrder());
             // find elements with same slopTo point[i]
             int m = 0;
             int n = 0;
             for (int j = 1; j < len; j++) {
-                if (points[i].slopeTo(auxiliaryPoints[j]) == points[i].slopeTo(auxiliaryPoints[m])) {
+                if (pointsEx[i].slopeTo(auxiliaryPoints[j]) == pointsEx[i].slopeTo(auxiliaryPoints[m])) {
                     n = i;
                 } else {
                     m = i;
@@ -46,7 +49,7 @@ public class FastCollinearPoints {
             if (n - m >= 2) {
                 // Arrays.sort sorts the array in place. So we point[i] is the smallest
                 // and the auxiliaryPoints[r] is the biggest.
-                segments.add(new LineSegment(points[i], auxiliaryPoints[n]));
+                segments.add(new LineSegment(pointsEx[i], auxiliaryPoints[n]));
             }
         }
 

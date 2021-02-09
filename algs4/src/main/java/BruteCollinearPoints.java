@@ -18,7 +18,7 @@ public class BruteCollinearPoints {
 
         Arrays.sort(pointsEx);
         for (int i = 1; i < pointsEx.length; i++) {
-            if (pointsEx[i - 1] == pointsEx[i]) {
+            if (pointsEx[i - 1].compareTo(pointsEx[i]) == 0) {
                 throw new IllegalArgumentException("contains a repeated point.");
             }
         }
