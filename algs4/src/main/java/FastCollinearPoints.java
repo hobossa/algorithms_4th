@@ -1,4 +1,6 @@
 
+import edu.princeton.cs.algs4.StdOut;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +52,14 @@ public class FastCollinearPoints {
                     m = j;
                 }
             }
+            if (n - m >= 2) {
+                // Arrays.sort sorts the array in place. So auxiliaryPoints[m] is the smallest
+                // and the auxiliaryPoints[n] is the biggest. Add LineSegment in to segments
+                // only if pointsEx[i] is the start point (smaller than auxiliaryPoint[m])
+                if (pointsEx[i].compareTo(auxiliaryPoints[m]) < 0) {
+                    segments.add(new LineSegment(pointsEx[i], auxiliaryPoints[n]));
+                }
+            }
         }
 
     }
@@ -76,29 +86,22 @@ public class FastCollinearPoints {
     }
 
     ///// test
-//    public static void main(String[] args) {
-//        //10000,  0
-//        //0,      10000
-//        //3000,   7000
-//        //7000,   3000
-//        //20000,  21000
-//        //3000,   4000
-//        //14000,  15000
-//        //6000,   7000
-//        Point[] points = new Point[8];
-//        points[0] = new Point(10000, 0);
-//        points[1] = new Point(0, 10000);
-//        points[2] = new Point(3000, 7000);
-//        points[3] = new Point(7000, 3000);
-//        points[4] = new Point(20000, 21000);
-//        points[5] = new Point(3000, 4000);
-//        points[6] = new Point(14000, 15000);
-//        points[7] = new Point(6000, 7000);
-//        FastCollinearPoints fcp = new FastCollinearPoints(points);
-//        StdOut.println(fcp.numberOfSegments());
-//        for (LineSegment line : fcp.segments()) {
-//            StdOut.println(line);
-//        }
-//    }
+    public static void main(String[] args) {
+
+        Point[] points = new Point[8];
+        points[0] = new Point(3000, 0);
+        points[1] = new Point(3000, 10000);
+        points[2] = new Point(3000, 7000);
+        points[3] = new Point(3000, 3000);
+        points[4] = new Point(20000, 8000);
+        points[5] = new Point(4000, 8000);
+        points[6] = new Point(14000, 8000);
+        points[7] = new Point(6000, 8000);
+        FastCollinearPoints fcp = new FastCollinearPoints(points);
+        StdOut.println(fcp.numberOfSegments());
+        for (LineSegment line : fcp.segments()) {
+            StdOut.println(line);
+        }
+    }
 
 }
