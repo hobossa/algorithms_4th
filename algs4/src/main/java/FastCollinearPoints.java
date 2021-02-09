@@ -1,9 +1,9 @@
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class FastCollinearPoints {
-    private final List<LineSegment> segments = new ArrayList<>();
+    private final List<LineSegment> segments = new LinkedList<>();
 
     // finds all line segments containing 4 or more points
     public FastCollinearPoints(Point[] points) {
@@ -59,7 +59,12 @@ public class FastCollinearPoints {
 
     // the line segments
     public LineSegment[] segments() {
-        return (LineSegment[]) segments.toArray();
+        LineSegment[] array = new LineSegment[numberOfSegments()];
+        int i = 0;
+        for (LineSegment line: segments) {
+            array[i++] = line;
+        }
+        return array;
     }
 
     private void validate(Object o) {
