@@ -1,19 +1,70 @@
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public class Board {
     // -------- nested class BoardIterator --------
     private class BoardIterator implements Iterator<Board> {
+        private int curNeighbor = 0;
+
         public BoardIterator() {
+            if (-1 == zeroRow) {
+                for (int i = 0; i < dimension; i++) {
+                    for (int j = 0; j < dimension; j++) {
+                        if (tiles[i][j] == 0) {
+                            zeroRow = i;
+                            zeroCol = j;
+                            return;
+                        }
+                    }
+                }
+                neighborMarks = new int[4][2];
+                for (int i = 0; i < 4; i++) {
+                    neighborMarks[i][0] = -1;
+                    neighborMarks[i][1] = -1;
+                }
+                int n = 0;
+                if (zeroCol > 0) {
+                    neighborMarks[n][0] = zeroRow;
+                    neighborMarks[n][1] = zeroCol - 1;
+                    n++;
+                }
+                if (zeroCol < dimension-1) {
+                    neighborMarks[n][0] = zeroRow;
+                    neighborMarks[n][1] = zeroCol + 1;
+                    n++;
+                }
+                if (zeroRow > 0) {
+                    neighborMarks[n][0] = zeroRow - 1;
+                    neighborMarks[n][1] = zeroCol;
+                    n++;
+                }
+                if (zeroRow < dimension - 1) {
+                    neighborMarks[n][0] = zeroRow + 1;
+                    neighborMarks[n][1] = zeroCol;
+                }
+            }
         }
 
         @Override
         public boolean hasNext() {
+            if (curNeighbor < 4) {
+                return neighborMarks[curNeighbor][0] != -1;
+            }
             return false;
         }
 
         @Override
         public Board next() {
-            return null;
+            //if (!hasNext()) {
+            //    throw new NoSuchElementException("nothing left");
+            //}
+            Board neighbor = new Board(tiles);
+            int neighborRow = neighborMarks[curNeighbor][0];
+            int neighborCol = neighborMarks[curNeighbor][1];
+            tiles[zeroRow][zeroCol] = tiles[neighborRow][neighborCol];
+            tiles[neighborRow][neighborCol] = 0;
+            curNeighbor++;
+            return neighbor;
         }
     } // -------- end of nested class BoardIterator --------
 
@@ -32,13 +83,19 @@ public class Board {
     private int hamming = -1;
     private int manhattan = -1;
 
+    private int zeroRow = -1;
+    private int zeroCol = -1;
+    private int[][] neighborMarks = null;
+
     // create a board from an n-by-n array of tiles,
     // where tiles[row][col] = tile at (row, col)
     public Board(int[][] tiles) {
         dimension = tiles.length;
         this.tiles = new int[dimension][dimension];
         for (int i = 0; i < dimension; i++) {
-            System.arraycopy(tiles[i], 0, this.tiles[i], 0, dimension);
+            for (int j = 0; j < dimension; j++) {
+                this.tiles[i][j] = tiles[i][j];
+            }
         }
     }
 
@@ -119,7 +176,7 @@ public class Board {
             return true;
         }
         if (y instanceof Board) {
-            Board o = (Board)y;
+            Board o = (Board) y;
             if (dimension != o.dimension) {
                 return false;
             }
