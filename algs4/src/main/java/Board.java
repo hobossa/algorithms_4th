@@ -140,7 +140,7 @@ public class Board {
                     if (v == 0) {
                         zeroRow = i;
                         zeroCol = j;
-                    } else if (v - 1 != i * dimension + j) {
+                    } else {
                         hamming += getHamming(v, i, j);
                     }
                 }
@@ -166,7 +166,7 @@ public class Board {
                     if (v == 0) {
                         zeroRow = i;
                         zeroCol = j;
-                    } else if (v - 1 != i * dimension + j) {
+                    } else {
                         // (v-1)/dimension, (v-1)%dimension
                         manhattan += getManhattan(v, i, j);
                     }
