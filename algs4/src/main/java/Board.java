@@ -65,8 +65,17 @@ public class Board {
             Board neighbor = new Board(tiles);
             int neighborRow = neighborMarks[curNeighbor][0];
             int neighborCol = neighborMarks[curNeighbor][1];
-            neighbor.tiles[zeroRow][zeroCol] = neighbor.tiles[neighborRow][neighborCol];
+            int v = neighbor.tiles[neighborRow][neighborCol];
+            neighbor.tiles[zeroRow][zeroCol] = v;
             neighbor.tiles[neighborRow][neighborCol] = 0;
+            if (-1 != hamming) {
+                neighbor.hamming = hamming +
+                        getHamming(v, zeroRow, zeroCol) - getHamming(v, neighborRow, neighborCol);
+            }
+            if (-1 != manhattan) {
+                neighbor.manhattan = manhattan +
+                        getManhattan(v, zeroRow, zeroCol) - getManhattan(v, neighborRow, neighborCol);
+            }
             curNeighbor++;
             return neighbor;
         }
@@ -132,12 +141,19 @@ public class Board {
                         zeroRow = i;
                         zeroCol = j;
                     } else if (v - 1 != i * dimension + j) {
-                        hamming++;
+                        hamming += getHamming(v, i, j);
                     }
                 }
             }
         }
         return hamming;
+    }
+
+    private int getHamming(int v, int row, int col) {
+        if (v != 0 && v - 1 != row * dimension + col) {
+            return 1;
+        }
+        return 0;
     }
 
     // sum of Manhattan distances between tiles and goal
@@ -152,13 +168,19 @@ public class Board {
                         zeroCol = j;
                     } else if (v - 1 != i * dimension + j) {
                         // (v-1)/dimension, (v-1)%dimension
-                        manhattan += Math.abs((v - 1) / dimension - i);
-                        manhattan += Math.abs((v - 1) % dimension - j);
+                        manhattan += getManhattan(v, i, j);
                     }
                 }
             }
         }
         return manhattan;
+    }
+
+    private int getManhattan(int v, int row, int col) {
+        if (v != 0 && v - 1 != row * dimension + col) {
+            return Math.abs((v - 1) / dimension - row) + Math.abs((v - 1) % dimension - col);
+        }
+        return 0;
     }
 
     // is this board the goal board?
@@ -227,15 +249,19 @@ public class Board {
 
     // unit testing (not graded)
     public static void main(String[] args) {
-        int[][] tiles = {{1, 0, 3}, {4, 2, 5}, {7, 8, 6}};
-        //int[][] tiles = {{8, 1, 3}, {4, 0, 2}, {7, 6, 5}};
+        //int[][] tiles = {{1, 0, 3}, {4, 2, 5}, {7, 8, 6}};
+        //int[][] tiles = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
+        int[][] tiles = {{8, 1, 3}, {4, 0, 2}, {7, 6, 5}};
         Board board = new Board(tiles);
         StdOut.println(board);
         StdOut.println("Hamming = " + board.hamming());
         StdOut.println("Manhattan = " + board.manhattan());
+        StdOut.println("IsGoal = " + board.isGoal());
         StdOut.println("neighbours:");
-        for (Board b: board.neighbors()) {
-            StdOut.println(b);
+        for (Board neighbor : board.neighbors()) {
+            StdOut.println(neighbor);
+            StdOut.println("Hamming = " + neighbor.hamming());
+            StdOut.println("Manhattan = " + neighbor.manhattan());
         }
     }
 }
