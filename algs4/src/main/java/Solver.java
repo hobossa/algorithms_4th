@@ -86,40 +86,43 @@ public class Solver {
 
     // test client (see below)
     public static void main(String[] args) {
-        // create initial board from file
-//        int[][] tiles = {{0,1,3},{4,2,5},{7,8,6}};
-//                Board initial = new Board(tiles);
-//
-//        // solve the puzzle
-//        Solver solver = new Solver(initial);
-//
-//        // print solution to standard output
-//        if (!solver.isSolvable())
-//            StdOut.println("No solution possible");
-//        else {
-//            StdOut.println("Minimum number of moves = " + solver.moves());
-//            for (Board board : solver.solution())
-//                StdOut.println(board);
-//        }
+        if (args.length == 0) {
+            // create initial board from file
+            //int[][] tiles = {{0,1,3},{4,2,5},{7,8,6}};
+            int[][] tiles = {{1,2,3},{4,5,6},{8,7,0}};
+            Board initial = new Board(tiles);
 
-        In in = new In(args[0]);
-        int n = in.readInt();
-        int[][] tiles = new int[n][n];
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < n; j++)
-                tiles[i][j] = in.readInt();
-        Board initial = new Board(tiles);
+            // solve the puzzle
+            Solver solver = new Solver(initial);
 
-        // solve the puzzle
-        Solver solver = new Solver(initial);
+            // print solution to standard output
+            if (!solver.isSolvable())
+                StdOut.println("No solution possible");
+            else {
+                StdOut.println("Minimum number of moves = " + solver.moves());
+                for (Board board : solver.solution())
+                    StdOut.println(board);
+            }
+        } else {
+            In in = new In(args[0]);
+            int n = in.readInt();
+            int[][] tiles = new int[n][n];
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < n; j++)
+                    tiles[i][j] = in.readInt();
+            Board initial = new Board(tiles);
 
-        // print solution to standard output
-        if (!solver.isSolvable())
-            StdOut.println("No solution possible");
-        else {
-            StdOut.println("Minimum number of moves = " + solver.moves());
-            for (Board board : solver.solution())
-                StdOut.println(board);
+            // solve the puzzle
+            Solver solver = new Solver(initial);
+
+            // print solution to standard output
+            if (!solver.isSolvable())
+                StdOut.println("No solution possible");
+            else {
+                StdOut.println("Minimum number of moves = " + solver.moves());
+                for (Board board : solver.solution())
+                    StdOut.println(board);
+            }
         }
     }
 }
