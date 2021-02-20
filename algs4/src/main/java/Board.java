@@ -224,7 +224,7 @@ public class Board {
             }
             return Arrays.deepEquals(tiles, o.tiles);
         }
-        return true;
+        return false;
     }
 
     // all neighboring boards
@@ -236,13 +236,11 @@ public class Board {
     public Board twin() {
         Board twin = new Board(tiles);
         if (tiles[0][0] != 0 && tiles[0][1] != 0) {
-            int temp = tiles[0][0];
-            tiles[0][0] = tiles[0][1];
-            tiles[0][1] = temp;
+            twin.tiles[0][0] = tiles[0][1];
+            twin.tiles[0][1] = tiles[0][0];
         } else if (tiles[1][0] != 0 && tiles[1][1] != 0) {
-            int temp = tiles[1][0];
-            tiles[1][0] = tiles[1][1];
-            tiles[1][1] = temp;
+            twin.tiles[1][0] = tiles[1][1];
+            twin.tiles[1][1] = tiles[1][0];
         }
         return twin;
     }
@@ -257,6 +255,7 @@ public class Board {
         StdOut.println("Hamming = " + board.hamming());
         StdOut.println("Manhattan = " + board.manhattan());
         StdOut.println("IsGoal = " + board.isGoal());
+        StdOut.println("Twin = \n" + board.twin());
         StdOut.println("neighbours:");
         for (Board neighbor : board.neighbors()) {
             StdOut.println(neighbor);
