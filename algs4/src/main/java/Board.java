@@ -1,3 +1,6 @@
+import edu.princeton.cs.algs4.StdOut;
+
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -13,10 +16,11 @@ public class Board {
                         if (tiles[i][j] == 0) {
                             zeroRow = i;
                             zeroCol = j;
-                            return;
                         }
                     }
                 }
+            }
+            if (null == neighborMarks) {
                 neighborMarks = new int[4][2];
                 for (int i = 0; i < 4; i++) {
                     neighborMarks[i][0] = -1;
@@ -28,7 +32,7 @@ public class Board {
                     neighborMarks[n][1] = zeroCol - 1;
                     n++;
                 }
-                if (zeroCol < dimension-1) {
+                if (zeroCol < dimension - 1) {
                     neighborMarks[n][0] = zeroRow;
                     neighborMarks[n][1] = zeroCol + 1;
                     n++;
@@ -61,8 +65,8 @@ public class Board {
             Board neighbor = new Board(tiles);
             int neighborRow = neighborMarks[curNeighbor][0];
             int neighborCol = neighborMarks[curNeighbor][1];
-            tiles[zeroRow][zeroCol] = tiles[neighborRow][neighborCol];
-            tiles[neighborRow][neighborCol] = 0;
+            neighbor.tiles[zeroRow][zeroCol] = neighbor.tiles[neighborRow][neighborCol];
+            neighbor.tiles[neighborRow][neighborCol] = 0;
             curNeighbor++;
             return neighbor;
         }
@@ -123,7 +127,11 @@ public class Board {
             hamming = 0;
             for (int i = 0; i < dimension; i++) {
                 for (int j = 0; j < dimension; j++) {
-                    if (tiles[i][j] - 1 != i * dimension + j) {
+                    int v = tiles[i][j];
+                    if (v == 0) {
+                        zeroRow = i;
+                        zeroCol = j;
+                    } else if (v - 1 != i * dimension + j) {
                         hamming++;
                     }
                 }
@@ -139,7 +147,10 @@ public class Board {
             for (int i = 0; i < dimension; i++) {
                 for (int j = 0; j < dimension; j++) {
                     int v = tiles[i][j];
-                    if (v - 1 != i * dimension + j) {
+                    if (v == 0) {
+                        zeroRow = i;
+                        zeroCol = j;
+                    } else if (v - 1 != i * dimension + j) {
                         // (v-1)/dimension, (v-1)%dimension
                         manhattan += Math.abs((v - 1) / dimension - i);
                         manhattan += Math.abs((v - 1) % dimension - j);
@@ -160,7 +171,16 @@ public class Board {
         }
         for (int i = 0; i < dimension; i++) {
             for (int j = 0; j < dimension; j++) {
-                if (tiles[i][j] - 1 != i * dimension + j) {
+                int v = tiles[i][j];
+                if (v == 0) {
+                    zeroRow = i;
+                    zeroCol = j;
+                    if (i == dimension - 1 && j == dimension - 1) {
+                        // true;
+                    } else {
+                        return false;
+                    }
+                } else if (v - 1 != i * dimension + j) {
                     return false;
                 }
             }
@@ -180,13 +200,7 @@ public class Board {
             if (dimension != o.dimension) {
                 return false;
             }
-            for (int i = 0; i < dimension; i++) {
-                for (int j = 0; j < dimension; j++) {
-                    if (tiles[i][j] != o.tiles[i][j]) {
-                        return false;
-                    }
-                }
-            }
+            return Arrays.deepEquals(tiles, o.tiles);
         }
         return true;
     }
@@ -198,11 +212,30 @@ public class Board {
 
     // a board that is obtained by exchanging any pair of tiles
     public Board twin() {
-        return null;
+        Board twin = new Board(tiles);
+        if (tiles[0][0] != 0 && tiles[0][1] != 0) {
+            int temp = tiles[0][0];
+            tiles[0][0] = tiles[0][1];
+            tiles[0][1] = temp;
+        } else if (tiles[1][0] != 0 && tiles[1][1] != 0) {
+            int temp = tiles[1][0];
+            tiles[1][0] = tiles[1][1];
+            tiles[1][1] = temp;
+        }
+        return twin;
     }
 
     // unit testing (not graded)
     public static void main(String[] args) {
-
+        int[][] tiles = {{1, 0, 3}, {4, 2, 5}, {7, 8, 6}};
+        //int[][] tiles = {{8, 1, 3}, {4, 0, 2}, {7, 6, 5}};
+        Board board = new Board(tiles);
+        StdOut.println(board);
+        StdOut.println("Hamming = " + board.hamming());
+        StdOut.println("Manhattan = " + board.manhattan());
+        StdOut.println("neighbours:");
+        for (Board b: board.neighbors()) {
+            StdOut.println(b);
+        }
     }
 }
