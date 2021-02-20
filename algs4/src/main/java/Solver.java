@@ -87,6 +87,21 @@ public class Solver {
     // test client (see below)
     public static void main(String[] args) {
         // create initial board from file
+//        int[][] tiles = {{0,1,3},{4,2,5},{7,8,6}};
+//                Board initial = new Board(tiles);
+//
+//        // solve the puzzle
+//        Solver solver = new Solver(initial);
+//
+//        // print solution to standard output
+//        if (!solver.isSolvable())
+//            StdOut.println("No solution possible");
+//        else {
+//            StdOut.println("Minimum number of moves = " + solver.moves());
+//            for (Board board : solver.solution())
+//                StdOut.println(board);
+//        }
+
         In in = new In(args[0]);
         int n = in.readInt();
         int[][] tiles = new int[n][n];
