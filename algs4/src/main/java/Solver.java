@@ -21,7 +21,7 @@ public class Solver {
 
         @Override
         public int compareTo(SearchNode o) {
-            return 0;
+            return (this.board.manhattan() + this.moves) - (o.board.manhattan() + o.moves);
         }
     } // -------- end of nested class SearchNode --------
 
@@ -30,7 +30,6 @@ public class Solver {
     private Board initial;
     private boolean isSolvable;
     private SearchNode goalNode = null;
-    private Comparator<SearchNode> comp = Comparator.comparingInt(o -> o.board.manhattan());
 
     // find a solution to the initial board (using the A* algorithm)
     public Solver(Board initial) {
@@ -47,9 +46,9 @@ public class Solver {
     }
 
     private boolean trySolvable() {
-        MinPQ<SearchNode> minPQ = new MinPQ<SearchNode>(1, comp);
+        MinPQ<SearchNode> minPQ = new MinPQ<SearchNode>();
         minPQ.insert(new SearchNode(initial, 0, null));
-        MinPQ<SearchNode> minPQTwin = new MinPQ<SearchNode>(1, comp);
+        MinPQ<SearchNode> minPQTwin = new MinPQ<SearchNode>();
         minPQTwin.insert(new SearchNode(initial.twin(), 0, null));
 
         while (true) {
