@@ -12,16 +12,18 @@ public class Solver {
         private Board board;
         private int moves;
         private SearchNode prev;
+        private int privilege;
 
         public SearchNode(Board board, int moves, SearchNode prev) {
             this.board = board;
             this.moves = moves;
             this.prev = prev;
+            this.privilege = this.moves + board.manhattan();
         }
 
         @Override
         public int compareTo(SearchNode o) {
-            return (this.board.manhattan() + this.moves) - (o.board.manhattan() + o.moves);
+            return this.privilege - o.privilege;
         }
     } // -------- end of nested class SearchNode --------
 
