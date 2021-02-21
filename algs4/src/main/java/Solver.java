@@ -20,7 +20,10 @@ public class Solver {
         }
     } // -------- end of nested class SearchNode --------
 
+    private static final int MAX_MOVES = 100;
+
     private Board initial;
+    private boolean isSolvable;
     private SearchNode goalNode = null;
     private Comparator<SearchNode> comp = Comparator.comparingInt(o -> o.board.manhattan());
 
@@ -30,10 +33,15 @@ public class Solver {
             throw new IllegalArgumentException("argument is null");
         }
         this.initial = initial;
+        this.isSolvable = trySolvable();
     }
 
     // is the initial board solvable? (see below)
     public boolean isSolvable() {
+        return isSolvable;
+    }
+
+    private boolean trySolvable() {
         MinPQ<SearchNode> minPQ = new MinPQ<SearchNode>(1, comp);
         minPQ.insert(new SearchNode(initial, 0, null));
         MinPQ<SearchNode> minPQTwin = new MinPQ<SearchNode>(1, comp);
@@ -44,10 +52,12 @@ public class Solver {
             if (node.board.isGoal()) {
                 goalNode = node;
                 return true;
-            } else {
+            } else if (node.moves >=  MAX_MOVES) {
+                break;
+            }else {
                 for (Board b : node.board.neighbors()) {
                     if (node.prev == null || !node.prev.board.equals(b)) {
-                        minPQ.insert(new SearchNode(b, node.moves+1, node));
+                        minPQ.insert(new SearchNode(b, node.moves + 1, node));
                     }
                 }
             }
@@ -58,11 +68,12 @@ public class Solver {
             } else {
                 for (Board bTwin : nodeTwin.board.neighbors()) {
                     if (nodeTwin.prev == null || !nodeTwin.prev.board.equals(bTwin)) {
-                        minPQTwin.insert(new SearchNode(bTwin, nodeTwin.moves+1, nodeTwin));
+                        minPQTwin.insert(new SearchNode(bTwin, nodeTwin.moves + 1, nodeTwin));
                     }
                 }
             }
         }
+        return false;
     }
 
     // min number of moves to solve initial board; -1 if unsolvable
@@ -88,8 +99,8 @@ public class Solver {
     public static void main(String[] args) {
         if (args.length == 0) {
             // create initial board from file
-            //int[][] tiles = {{0,1,3},{4,2,5},{7,8,6}};
-            int[][] tiles = {{1,2,3},{4,5,6},{8,7,0}};
+            //int[][] tiles = {{0, 1, 3}, {4, 2, 5}, {7, 8, 6}};
+            int[][] tiles = {{1,0,2},{7,5,4},{8,6,3}};
             Board initial = new Board(tiles);
 
             // solve the puzzle
