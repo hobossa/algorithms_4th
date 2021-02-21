@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Solver {
     // -------- nested class SearchNode --------
-    private class SearchNode {
+    private class SearchNode implements Comparable<SearchNode> {
         private Board board;
         private int moves;
         private SearchNode prev;
@@ -17,6 +17,11 @@ public class Solver {
             this.board = board;
             this.moves = moves;
             this.prev = prev;
+        }
+
+        @Override
+        public int compareTo(SearchNode o) {
+            return 0;
         }
     } // -------- end of nested class SearchNode --------
 
@@ -52,12 +57,12 @@ public class Solver {
             if (node.board.isGoal()) {
                 goalNode = node;
                 return true;
-            } else if (node.moves >=  MAX_MOVES) {
+            } else if (node.moves >= MAX_MOVES) {
                 break;
-            }else {
-                for (Board b : node.board.neighbors()) {
-                    if (node.prev == null || !node.prev.board.equals(b)) {
-                        minPQ.insert(new SearchNode(b, node.moves + 1, node));
+            } else {
+                for (Board neighbor : node.board.neighbors()) {
+                    if (node.prev == null || !node.prev.board.equals(neighbor)) {
+                        minPQ.insert(new SearchNode(neighbor, node.moves + 1, node));
                     }
                 }
             }
@@ -66,9 +71,9 @@ public class Solver {
             if (nodeTwin.board.isGoal()) {
                 return false;
             } else {
-                for (Board bTwin : nodeTwin.board.neighbors()) {
-                    if (nodeTwin.prev == null || !nodeTwin.prev.board.equals(bTwin)) {
-                        minPQTwin.insert(new SearchNode(bTwin, nodeTwin.moves + 1, nodeTwin));
+                for (Board neighborTwin : nodeTwin.board.neighbors()) {
+                    if (nodeTwin.prev == null || !nodeTwin.prev.board.equals(neighborTwin)) {
+                        minPQTwin.insert(new SearchNode(neighborTwin, nodeTwin.moves + 1, nodeTwin));
                     }
                 }
             }
@@ -100,7 +105,8 @@ public class Solver {
         if (args.length == 0) {
             // create initial board from file
             //int[][] tiles = {{0, 1, 3}, {4, 2, 5}, {7, 8, 6}};
-            int[][] tiles = {{1,0,2},{7,5,4},{8,6,3}};
+            int[][] tiles = {{1, 0, 2}, {7, 5, 4}, {8, 6, 3}};
+            //int[][] tiles = {{4, 8, 2}, {3, 6, 5}, {1, 7, 0}};
             Board initial = new Board(tiles);
 
             // solve the puzzle
