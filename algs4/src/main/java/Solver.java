@@ -2,7 +2,6 @@ import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.MinPQ;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,18 +11,18 @@ public class Solver {
         private Board board;
         private int moves;
         private SearchNode prev;
-        private int privilege;
+        private int priority;
 
         public SearchNode(Board board, int moves, SearchNode prev) {
             this.board = board;
             this.moves = moves;
             this.prev = prev;
-            this.privilege = this.moves + board.manhattan();
+            this.priority = this.moves + board.manhattan();
         }
 
         @Override
         public int compareTo(SearchNode o) {
-            return this.privilege - o.privilege;
+            return this.priority - o.priority;
         }
     } // -------- end of nested class SearchNode --------
 
