@@ -173,9 +173,11 @@ public class KdTree {
         if (null == p) {
             throw new IllegalArgumentException();
         }
-        Node near = root;
-        double minDistance = Double.MAX_VALUE;
+        if (root == null) {
+            return null;
+        }
 
+        double minDistance = Double.MAX_VALUE;
         return nearest(p, root, minDistance).p;
     }
 
