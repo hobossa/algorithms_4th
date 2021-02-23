@@ -71,7 +71,7 @@ public class PointSET {
             throw new IllegalArgumentException();
         }
         Point2D pNearest = null;
-        double minDistance = Double.MAX_VALUE;
+        double minDistance = Double.POSITIVE_INFINITY;
         for (Point2D point : points) {
             double distance = point.distanceTo(p);
             if (distance < minDistance) {

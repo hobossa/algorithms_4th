@@ -177,7 +177,7 @@ public class KdTree {
             return null;
         }
 
-        double minDistance = Double.MAX_VALUE;
+        double minDistance = Double.POSITIVE_INFINITY;
         return nearest(p, root, minDistance).p;
     }
 
