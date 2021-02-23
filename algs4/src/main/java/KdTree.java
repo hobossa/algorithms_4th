@@ -176,27 +176,43 @@ public class KdTree {
         Node near = root;
         double minDistance = Double.MAX_VALUE;
 
-        return null;
+        return nearest(p, root, minDistance).p;
     }
 
     private Node nearest(Point2D p, Node node, double distance) {
         if (node == null) {
             return null;
         }
+        Node nodeReturn = null;
         double d = p.distanceTo(node.p);
         if (d < distance) {
             distance = d;
+            nodeReturn = node;
         }
         Node n1 = null, n2 = null;
         if (0 == node.level) {
             if (p.x() < node.p.x()) {
                 n1 = nearest(p, node.left, distance);
+                if (n1 != null) {
+                    d = p.distanceTo(n1.p);
+                    if (d < distance) {
+                        nodeReturn = n1;
+                        distance = d;
+                    }
+                }
                 if (distance >= node.p.x() - p.x()) {
                     // we still need to search right
                     n2 = nearest(p, node.right, distance);
                 }
             } else {
                 n1 = nearest(p, node.right, distance);
+                if (n1 != null) {
+                    d = p.distanceTo(n1.p);
+                    if (d < distance) {
+                        nodeReturn = n1;
+                        distance = d;
+                    }
+                }
                 if (distance > p.x()-node.p.x()) {
                     // we Still need to search Left
                     n2 = nearest(p, node.left, distance);
@@ -204,8 +220,41 @@ public class KdTree {
             }
         } else {
             // 1 == node.level
+            if (p.y() < node.p.y()) {
+                n1 = nearest(p, node.left, distance);
+                if (n1 != null) {
+                    d = p.distanceTo(n1.p);
+                    if (d < distance) {
+                        nodeReturn = n1;
+                        distance = d;
+                    }
+                }
+                if (distance >= node.p.y() - p.y()) {
+                    n2 = nearest(p, node.right, distance);
+                }
+            } else {
+                n1 = nearest(p, node.right, distance);
+                if (n1 != null) {
+                    d = p.distanceTo(n1.p);
+                    if (d < distance) {
+                        nodeReturn = n1;
+                        distance = d;
+                    }
+                }
+                if (distance > p.y() - node.p.y()) {
+                    n2 = nearest(p, node.left, distance);
+                }
+            }
         }
-        return null;
+
+        if (n2 != null) {
+            d = p.distanceTo(n2.p);
+            if (d < distance) {
+                nodeReturn = n2;
+                distance = d;
+            }
+        }
+        return nodeReturn;
     }
 
     // unit testing of the methods (optional)
