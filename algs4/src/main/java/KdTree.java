@@ -25,6 +25,10 @@ public class KdTree {
             this.p = p;
             this.level = (parent.level + 1) % 2;
         }
+
+        public boolean isVertical() {
+            return 0 == level;
+        }
     } // ------ end of nested class Node --------
 
     private Node root = null;
@@ -106,7 +110,7 @@ public class KdTree {
             if (p.equals(cur.p)) {
                 return true;
             }
-            if (0 == cur.level) {
+            if (cur.isVertical()) {
                 if (p.x() < cur.p.x()) {
                     cur = cur.left;
                 } else {
@@ -150,7 +154,7 @@ public class KdTree {
         if (rect.contains(node.p)) {
             points.add(node.p);
         }
-        if (0 == node.level) {
+        if (node.isVertical()) {
             if (rect.xmin() < node.p.x()) {
                 range(rect, points, node.left);
             }
@@ -186,76 +190,60 @@ public class KdTree {
             return null;
         }
         Node nodeReturn = null;
+        Node nodeTemp = null;
         double d = p.distanceTo(node.p);
         if (d < distance) {
             distance = d;
             nodeReturn = node;
         }
-        Node n1 = null, n2 = null;
-        if (0 == node.level) {
-            if (p.x() < node.p.x()) {
-                n1 = nearest(p, node.left, distance);
-                if (n1 != null) {
-                    d = p.distanceTo(n1.p);
-                    if (d < distance) {
-                        nodeReturn = n1;
-                        distance = d;
-                    }
-                }
-                if (distance >= node.p.x() - p.x()) {
-                    // we still need to search right
-                    n2 = nearest(p, node.right, distance);
-                }
-            } else {
-                n1 = nearest(p, node.right, distance);
-                if (n1 != null) {
-                    d = p.distanceTo(n1.p);
-                    if (d < distance) {
-                        nodeReturn = n1;
-                        distance = d;
-                    }
-                }
-                if (distance > p.x()-node.p.x()) {
-                    // we Still need to search Left
-                    n2 = nearest(p, node.left, distance);
+
+        double px = p.x();
+        double py = p.y();
+        double nx = node.p.x();
+        double ny = node.p.y();
+
+        if ((node.isVertical() && px < nx) || (!node.isVertical() && py < ny)) {
+            nodeTemp = nearest(p, node.left, distance);
+            if (null != nodeTemp) {
+                d = p.distanceTo(nodeTemp.p);
+                if (d < distance) {
+                    distance = d;
+                    nodeReturn = nodeTemp;
                 }
             }
-        } else {
-            // 1 == node.level
-            if (p.y() < node.p.y()) {
-                n1 = nearest(p, node.left, distance);
-                if (n1 != null) {
-                    d = p.distanceTo(n1.p);
+            if (((node.isVertical() && distance > nx - px))
+                    || (!node.isVertical() && distance > ny - py)) {
+                nodeTemp = nearest(p, node.right, distance);
+                if (null != nodeTemp) {
+                    d = p.distanceTo(nodeTemp.p);
                     if (d < distance) {
-                        nodeReturn = n1;
                         distance = d;
+                        nodeReturn = nodeTemp;
                     }
                 }
-                if (distance >= node.p.y() - p.y()) {
-                    n2 = nearest(p, node.right, distance);
+            }
+        } else { //if ((node.isVertical() && px >= nx) || (!node.isVertical() && py >= ny))
+            nodeTemp = nearest(p, node.right, distance);
+            if (null != nodeTemp) {
+                d = p.distanceTo(nodeTemp.p);
+                if (d < distance) {
+                    distance = d;
+                    nodeReturn = nodeTemp;
                 }
-            } else {
-                n1 = nearest(p, node.right, distance);
-                if (n1 != null) {
-                    d = p.distanceTo(n1.p);
+            }
+            if ((node.isVertical() && distance > px - nx)
+                    || (!node.isVertical() && distance > py - ny)) {
+                nodeTemp = nearest(p, node.left, distance);
+                if (null != nodeTemp) {
+                    d = p.distanceTo(nodeTemp.p);
                     if (d < distance) {
-                        nodeReturn = n1;
                         distance = d;
+                        nodeReturn = nodeTemp;
                     }
-                }
-                if (distance > p.y() - node.p.y()) {
-                    n2 = nearest(p, node.left, distance);
                 }
             }
         }
 
-        if (n2 != null) {
-            d = p.distanceTo(n2.p);
-            if (d < distance) {
-                nodeReturn = n2;
-                distance = d;
-            }
-        }
         return nodeReturn;
     }
 
