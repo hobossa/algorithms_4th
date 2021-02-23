@@ -8,4 +8,4 @@
     - Deques and Randomized Queues 100%
     - Collinear Points 100%
     - 8 Puzzle 100%
-    - Kd-Trees 97% (failed 2 testes with the right nearest points )
+    - Kd-Trees 97% (failed 2 traversal testes with the right nearest points )
