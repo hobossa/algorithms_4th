@@ -11,6 +11,7 @@ public class WordNet {
 
     final Map<String, Set<Integer>> nounMap;
     final Digraph digraph;
+    final SAP sap;
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
@@ -48,6 +49,8 @@ public class WordNet {
                 digraph.addEdge(v, w);
             }
         }
+
+        sap = new SAP(digraph);
     }
 
     // returns all WordNet nouns
@@ -62,7 +65,7 @@ public class WordNet {
 
     // distance between nounA and nounB (defined below)
     public int distance(String nounA, String nounB) {
-        if (nounA == null || nounB == null) {
+        if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException("arguments are null.");
         }
         return -1;
@@ -72,7 +75,7 @@ public class WordNet {
     // the common ancestor of nounA and nounB
     // in a shortest ancestral path (defined below)
     public String sap(String nounA, String nounB) {
-        if (nounA == null || nounB == null) {
+        if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException("arguments are null.");
         }
         return null;
