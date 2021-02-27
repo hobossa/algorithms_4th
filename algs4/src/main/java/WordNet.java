@@ -1,17 +1,21 @@
-import edu.princeton.cs.algs4.*;
+import edu.princeton.cs.algs4.Digraph;
+import edu.princeton.cs.algs4.In;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class WordNet {
-    public static final String FIELD_SEPARATOR = ",";
-    public static final String NOUN_SEPARATOR = " ";
 
-    final Map<String, Set<Integer>> nounMap;
-    final Digraph digraph;
-    final SAP sap;
+public class WordNet {
+    final private static String FIELD_SEPARATOR = ",";
+    final private static String NOUN_SEPARATOR = " ";
+
+    final private Map<String, Set<Integer>> nounMap;
+    final private Map<Integer, String> nounSet;
+    final private Digraph digraph;
+    final private SAP sap;
 
     // constructor takes the name of the two input files
     public WordNet(String synsets, String hypernyms) {
@@ -23,11 +27,13 @@ public class WordNet {
         int count = 0;
         In inSynSets = new In(synsets);
         nounMap = new HashMap<>();
+        nounSet = new TreeMap<>();
         while (inSynSets.hasNextLine()) {
             count++;
             String line = inSynSets.readLine();
             String[] fields = line.split(FIELD_SEPARATOR);
             Integer id = Integer.parseInt(fields[0]);
+            nounSet.put(id, fields[1]);
             String[] nouns = fields[1].split(NOUN_SEPARATOR);
             for (String noun : nouns) {
                 if (!nounMap.containsKey(noun)) {
@@ -68,7 +74,7 @@ public class WordNet {
         if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException("arguments are null.");
         }
-        return -1;
+        return sap.length(nounMap.get(nounA), nounMap.get(nounB));
     }
 
     // a synset (second field of synsets.txt) that is
@@ -78,7 +84,8 @@ public class WordNet {
         if (!isNoun(nounA) || !isNoun(nounB)) {
             throw new IllegalArgumentException("arguments are null.");
         }
-        return null;
+        int ancestor = sap.ancestor(nounMap.get(nounA), nounMap.get(nounB));
+        return nounSet.get(ancestor);
     }
 
     // do unit testing of this class
