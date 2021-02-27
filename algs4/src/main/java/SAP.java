@@ -146,14 +146,13 @@ public class SAP {
         if (G == null) {
             throw new IllegalArgumentException("arguments are null.");
         }
-        digraph = G;
+        digraph = new Digraph(G);
     }
 
     // length of shortest ancestral path between v and w; -1 if no such path
     public int length(int v, int w) {
-        if (v < 0 || v > digraph.V() || w < 0 || w > digraph.V()) {
-            throw new IllegalArgumentException();
-        }
+        validate(v);
+        validate(w);
         // bidirectional search would be better.
         BreadthFirstDirectedPathsEx vPath = new BreadthFirstDirectedPathsEx(digraph, v);
         BreadthFirstDirectedPathsEx wPath = new BreadthFirstDirectedPathsEx(digraph, w);
@@ -173,9 +172,8 @@ public class SAP {
 
     // a common ancestor of v and w that participates in a shortest ancestral path; -1 if no such path
     public int ancestor(int v, int w) {
-        if (v < 0 || v > digraph.V() || w < 0 || w > digraph.V()) {
-            throw new IllegalArgumentException();
-        }
+        validate(v);
+        validate(w);
         // bidirectional search would be better.
         BreadthFirstDirectedPathsEx vPath = new BreadthFirstDirectedPathsEx(digraph, v);
         BreadthFirstDirectedPathsEx wPath = new BreadthFirstDirectedPathsEx(digraph, w);
@@ -195,6 +193,8 @@ public class SAP {
 
     // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
     public int length(Iterable<Integer> v, Iterable<Integer> w) {
+        validate(v);
+        validate(w);
         // bidirectional search would be better.
         BreadthFirstDirectedPathsEx vPath = new BreadthFirstDirectedPathsEx(digraph, v);
         BreadthFirstDirectedPathsEx wPath = new BreadthFirstDirectedPathsEx(digraph, w);
@@ -214,9 +214,8 @@ public class SAP {
 
     // a common ancestor that participates in shortest ancestral path; -1 if no such path
     public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-        if (v == null || w == null) {
-            throw new IllegalArgumentException();
-        }
+        validate(v);
+        validate(w);
         // bidirectional search would be better.
         BreadthFirstDirectedPathsEx vPath = new BreadthFirstDirectedPathsEx(digraph, v);
         BreadthFirstDirectedPathsEx wPath = new BreadthFirstDirectedPathsEx(digraph, w);
@@ -232,6 +231,25 @@ public class SAP {
             }
         }
         return ancestor;
+    }
+
+    private void validate(Iterable<Integer> s) {
+        if (null == s) {
+            throw new IllegalArgumentException();
+        }
+        int count = 0;
+        for (Integer n: s) {
+            count++;
+        }
+        if ( 0 == count) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void validate(int n) {
+        if (n < 0 || n > digraph.V()) {
+            throw new IllegalArgumentException();
+        }
     }
 
     // do unit testing of this class

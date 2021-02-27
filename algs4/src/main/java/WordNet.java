@@ -66,6 +66,9 @@ public class WordNet {
 
     // is the word a WordNet noun?
     public boolean isNoun(String word) {
+        if (null == word) {
+            throw new IllegalArgumentException();
+        }
         return nounMap.containsKey(word);
     }
 
