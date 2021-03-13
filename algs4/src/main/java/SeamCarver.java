@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.Picture;
+import edu.princeton.cs.algs4.StdOut;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -25,16 +26,29 @@ public class SeamCarver {
         // init rgbMatrix
         rgbMatrix = new int[width() * height()];
         int count = 0;
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
+        for (int j = 0; j < height(); j++) {
+            for (int i = 0; i < width(); i++) {
                 rgbMatrix[count++] = picture.getRGB(i, j);
             }
         }
+//        for (int j = 0; j < height(); j++) {
+//            for (int i = 0; i < width(); i++) {
+//                int rgb = picture.getRGB(i, j);
+//                assert (rgb == picture.getRGB(i, j));
+//                Color col = picture.get(i, j);
+//                int r = (rgb >> 16) & 0xFF;
+//                int g = (rgb >> 8) & 0xFF;
+//                int b = rgb & 0xFF; //(rgb >> 0) & 0xFF;
+//                assert (r == col.getRed());
+//                assert (g == col.getGreen());
+//                assert (b == col.getBlue());
+//            }
+//        }
         // initial energyMatrix
         energyMatrix = new double[width() * height()];
         count = 0;
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
+        for (int j = 0; j < height(); j++) {
+            for (int i = 0; i < width(); i++) {
                 energyMatrix[count++] = calculateEnergy(i, j);
             }
         }
@@ -44,8 +58,8 @@ public class SeamCarver {
     public Picture picture() {
         Picture pic = new Picture(width(), height());
         int c = 0;
-        for (int i = 0; i < width(); i++) {
-            for (int j = 0; j < height(); j++) {
+        for (int j = 0; j < height(); j++) {
+            for (int i = 0; i < width(); i++) {
                 pic.setRGB(i, j, rgbMatrix[c++]);
             }
         }
@@ -74,7 +88,6 @@ public class SeamCarver {
         double[][] totalEng = new double[width()][height()];
         for (int i = 1; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-
                 totalEng[i][j] = Double.POSITIVE_INFINITY;
             }
         }
@@ -315,20 +328,44 @@ public class SeamCarver {
         int down = getRGB(x, y + 1);
         int left = getRGB(x - 1, y);
         int right = getRGB(x + 1, y);
-//        int r = (rgb >> 16) & 0xFF;
-//        int g = (rgb >>  8) & 0xFF;
-//        int b = (rgb >>  0) & 0xFF; // rgb & 0xFF;
-        double dVertical = Math.pow((up >> 16) & 0xFF - (down >> 16) & 0xFF, 2)
-                + Math.pow((up >> 8) & 0xFF - (down >> 8) & 0xFF, 2)
-                + Math.pow((up) & 0xFF - (down) & 0xFF, 2);
-        double dHorizontal = Math.pow((left >> 16) & 0xFF - (right >> 16) & 0xFF, 2)
-                + Math.pow((left >> 8) & 0xFF - (right >> 8) & 0xFF, 2)
-                + Math.pow((left) & 0xFF - (right) & 0xFF, 2);
+
+        double dVertical = Math.pow(getRed(up) - getRed(down), 2)
+                + Math.pow(getGreen(up) - getGreen(down), 2)
+                + Math.pow(getBlue(up) - getBlue(down), 2);
+        double dHorizontal = Math.pow(getRed(left) - getRed(right), 2)
+                + Math.pow(getGreen(left) - getGreen(right), 2)
+                + Math.pow(getBlue(left) - getBlue(right), 2);
         return Math.sqrt(dVertical + dHorizontal);
+    }
+
+//    int r = (rgb >> 16) & 0xFF;
+//    int g = (rgb >>  8) & 0xFF;
+//    int b = (rgb >>  0) & 0xFF; // rgb & 0xFF;
+    private int getRed(int rgb) {
+        return (rgb >> 16) & 0xFF;
+    }
+
+    private int getGreen(int rgb) {
+        return (rgb >>  8) & 0xFF;
+    }
+
+    private int getBlue(int rgb) {
+        return rgb & 0xFF;  // (rgb >>  0) & 0xFF;
     }
 
     //  unit testing (optional)
     public static void main(String[] args) {
+        Picture picture = new Picture("6x5.png");
+        StdOut.printf("image is %d pixels wide by %d pixels high.\n", picture.width(), picture.height());
 
+        SeamCarver sc = new SeamCarver(picture);
+
+        StdOut.printf("Printing energy calculated for each pixel.\n");
+
+        for (int row = 0; row < sc.height(); row++) {
+            for (int col = 0; col < sc.width(); col++)
+                StdOut.printf("%9.0f ", sc.energy(col, row));
+            StdOut.println();
+        }
     }
 }
