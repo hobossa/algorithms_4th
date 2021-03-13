@@ -1,12 +1,17 @@
 import edu.princeton.cs.algs4.Picture;
 
 import java.awt.Color;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class SeamCarver {
-    private int[][] rgbMatrix;
+
     private int width;
     private int height;
-    private double[][] energyMatrix;
+    // using a dimensional array to present a matrix so that we
+    // can use System.arrayCopy easily to opt performance.
+    private int[] rgbMatrix;
+    private double[] energyMatrix;
 
     // create a seam carver object based on the given picture
     public SeamCarver(Picture picture) {
@@ -17,23 +22,34 @@ public class SeamCarver {
         width = picture.width();
         height = picture.height();
 
-        rgbMatrix = new int[width()][height()];
+        // init rgbMatrix
+        rgbMatrix = new int[width() * height()];
+        int count = 0;
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-                rgbMatrix[i][j] = picture.getRGB(i, j);
+                rgbMatrix[count++] = picture.getRGB(i, j);
             }
         }
-        energyMatrix = new double[width()][height()];
+        // initial energyMatrix
+        energyMatrix = new double[width() * height()];
+        count = 0;
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-                energyMatrix[i][j] = energy(i, j);
+                energyMatrix[count++] = calculateEnergy(i, j);
             }
         }
     }
 
     // current picture
     public Picture picture() {
-        return null;
+        Picture pic = new Picture(width(), height());
+        int c = 0;
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                pic.setRGB(i, j, rgbMatrix[c++]);
+            }
+        }
+        return pic;
     }
 
     // width of current picture
@@ -48,31 +64,8 @@ public class SeamCarver {
 
     // energy of pixel at column x and row y
     public double energy(int x, int y) {
-        if (x < 0 || x > width() - 1
-                || y < 0 || y > height() - 1) {
-            throw new IllegalArgumentException();
-        }
-
-        if (x == 0 || x == width() - 1
-                || y == 0 || y == height() - 1) {
-            return 1000.0;
-        }
-
-        int up = rgbMatrix[x][y-1];
-        int down = rgbMatrix[x][y+1];
-        int left = rgbMatrix[x-1][y];
-        int right = rgbMatrix[x+1][y];
-//        int r = (rgb >> 16) & 0xFF;
-//        int g = (rgb >>  8) & 0xFF;
-//        int b = (rgb >>  0) & 0xFF; // rgb & 0xFF;
-        double dVertical = Math.pow((up >> 16) & 0xFF - (down >> 16) & 0xFF, 2)
-                + Math.pow((up >> 8) & 0xFF - (down >> 8) & 0xFF, 2)
-                + Math.pow((up) & 0xFF - (down) & 0xFF, 2);
-        double dHorizontal = Math.pow((left >> 16) & 0xFF - (right >> 16) & 0xFF, 2)
-                + Math.pow((left >> 8) & 0xFF - (right >> 8) & 0xFF, 2)
-                + Math.pow((left) & 0xFF - (right) & 0xFF, 2);
-        return Math.sqrt(dVertical + dHorizontal);
-
+        int i = x + y * width();
+        return energyMatrix[i];
     }
 
     // sequence of indices for horizontal seam
@@ -105,13 +98,13 @@ public class SeamCarver {
                 }
                 totalEng[i][j] = totalEng[i - 1][min] + energy(i, j);
                 pre[i][j] = min;
-             }
+            }
         }
 
         double minEnergy = Double.POSITIVE_INFINITY;
         int last = -1;
         for (int j = 1; j < height() - 1; j++) {
-            if (totalEng[width()-1][j] < minEnergy) {
+            if (totalEng[width() - 1][j] < minEnergy) {
                 last = j;
             }
         }
@@ -194,6 +187,26 @@ public class SeamCarver {
         }
 
         // update rgbMatrix, energyMatrix, and height
+        int len = seam.length;
+        int[] posToRemove = new int[len];
+        for (int i = 0; i < len; i++) {
+            // (i, seam[i])
+            posToRemove[i] = i + seam[i] * width();
+        }
+        Arrays.sort(posToRemove);
+
+        // update rgbMatrix
+        removeFromArray(rgbMatrix, posToRemove);
+        // update energyMatrix
+        removeFromArray(energyMatrix, posToRemove);
+        // recalculate energy of some items.
+        for (int i = 0; i < len; i++) {
+            // reCalculate energy of (i, seam[i]-1) and (i, seam[i])
+            setEnergy(i, seam[i] - 1, calculateEnergy(i, seam[i] - 1));
+            setEnergy(i, seam[i], calculateEnergy(i, seam[i]));
+        }
+
+        height--;
     }
 
     // remove vertical seam from current picture
@@ -213,8 +226,105 @@ public class SeamCarver {
             pre = i;
         }
 
-        // System.arraycopy();
         // update rgbMatrix, energyMatrix, and width
+        int len = seam.length;
+        int[] posToRemove = new int[len];
+        for (int i = 0; i < len; i++) {
+            // (seam[i], i)
+            posToRemove[i] = +seam[i] + i * width();
+        }
+        // Arrays.sort(posToRemove); // for vertical seam, posToRemove is already sorted
+
+        // update rgbMatrix
+        removeFromArray(rgbMatrix, posToRemove);
+        // update energyMatrix
+        removeFromArray(energyMatrix, posToRemove);
+        // recalculate energy of some items.
+        for (int i = 0; i < len; i++) {
+            // reCalculate energy of (seam[i]-1, i) and (seam[i], i)
+            setEnergy(seam[i] - 1, i, calculateEnergy(seam[i] - 1, i));
+            setEnergy(seam[i], i, calculateEnergy(seam[i], i));
+        }
+
+        width--;
+    }
+
+    private static <T> void removeFromArray(int[] srcArray, int[] posToRemove) {
+        int count = posToRemove.length;
+        int[] posArray = new int[count];
+        System.arraycopy(posToRemove, 0, posArray, 0, count);
+        Arrays.sort(posArray);
+        for (int i = 0; i < count; i++) {
+            int lenToMove;
+            if (i == count - 1) {
+                lenToMove = srcArray.length - posArray[i] - 1;
+            } else {
+                lenToMove = posArray[i + 1] - posArray[i];
+            }
+
+            System.arraycopy(srcArray, posArray[i] + 1,
+                    srcArray, posArray[i] - i,
+                    lenToMove);
+        }
+    }
+
+    private static <T> void removeFromArray(double[] srcArray, int[] posToRemove) {
+        // posToRemove must be a from small to large sorted array
+        int count = posToRemove.length;
+        for (int i = 0; i < count; i++) {
+            int lenToMove;
+            if (i == count - 1) {
+                lenToMove = srcArray.length - posToRemove[i] - 1;
+            } else {
+                lenToMove = posToRemove[i + 1] - posToRemove[i];
+            }
+
+            System.arraycopy(srcArray, posToRemove[i] + 1,
+                    srcArray, posToRemove[i] - i,
+                    lenToMove);
+        }
+    }
+
+    private int getRGB(int x, int y) {
+        int i = x + y * width();
+        return rgbMatrix[i];
+    }
+
+    private void setRGB(int x, int y, int rgb) {
+        int i = x + y * width();
+        rgbMatrix[i] = rgb;
+    }
+
+    private void setEnergy(int x, int y, double eng) {
+        int i = x + y * width();
+        energyMatrix[i] = eng;
+    }
+
+    private double calculateEnergy(int x, int y) {
+        if (x < 0 || x > width() - 1
+                || y < 0 || y > height() - 1) {
+            throw new IllegalArgumentException();
+        }
+
+        if (x == 0 || x == width() - 1
+                || y == 0 || y == height() - 1) {
+            return 1000.0;
+        }
+
+        int up = getRGB(x, y - 1);
+        int down = getRGB(x, y + 1);
+        int left = getRGB(x - 1, y);
+        int right = getRGB(x + 1, y);
+//        int r = (rgb >> 16) & 0xFF;
+//        int g = (rgb >>  8) & 0xFF;
+//        int b = (rgb >>  0) & 0xFF; // rgb & 0xFF;
+        double dVertical = Math.pow((up >> 16) & 0xFF - (down >> 16) & 0xFF, 2)
+                + Math.pow((up >> 8) & 0xFF - (down >> 8) & 0xFF, 2)
+                + Math.pow((up) & 0xFF - (down) & 0xFF, 2);
+        double dHorizontal = Math.pow((left >> 16) & 0xFF - (right >> 16) & 0xFF, 2)
+                + Math.pow((left >> 8) & 0xFF - (right >> 8) & 0xFF, 2)
+                + Math.pow((left) & 0xFF - (right) & 0xFF, 2);
+        return Math.sqrt(dVertical + dHorizontal);
     }
 
     //  unit testing (optional)
