@@ -3,7 +3,9 @@ import edu.princeton.cs.algs4.Picture;
 import java.awt.Color;
 
 public class SeamCarver {
-    private Picture picture;
+    private int[][] rgbMatrix;
+    private int width;
+    private int height;
     private double[][] energyMatrix;
 
     // create a seam carver object based on the given picture
@@ -11,7 +13,16 @@ public class SeamCarver {
         if (null == picture) {
             throw new IllegalArgumentException();
         }
-        this.picture = new Picture(picture);
+
+        width = picture.width();
+        height = picture.height();
+
+        rgbMatrix = new int[width()][height()];
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                rgbMatrix[i][j] = picture.getRGB(i, j);
+            }
+        }
         energyMatrix = new double[width()][height()];
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
@@ -22,17 +33,17 @@ public class SeamCarver {
 
     // current picture
     public Picture picture() {
-        return new Picture(picture);
+        return null;
     }
 
     // width of current picture
     public int width() {
-        return picture.width();
+        return width;
     }
 
     // height of current picture
     public int height() {
-        return picture.height();
+        return height;
     }
 
     // energy of pixel at column x and row y
@@ -47,24 +58,13 @@ public class SeamCarver {
             return 1000.0;
         }
 
-//        Color up = picture.get(x, y - 1);
-//        Color down = picture.get(x, y + 1);
-//        Color left = picture.get(x - 1, y);
-//        Color right = picture.get(x + 1, y);
-//        double dVertical = Math.pow(up.getRed() - down.getRed(), 2)
-//                + Math.pow(up.getGreen() - down.getGreen(), 2)
-//                + Math.pow(up.getBlue() - down.getBlue(), 2);
-//        double dHorizontal = Math.pow(left.getRed() - right.getRed(), 2)
-//                + Math.pow(left.getGreen() - right.getGreen(), 2)
-//                + Math.pow(left.getBlue() - right.getBlue(), 2);
-//        return Math.sqrt(dVertical + dHorizontal);
-        int up = picture.getRGB(x, y - 1);
-        int down = picture.getRGB(x, y + 1);
-        int left = picture.getRGB(x - 1, y);
-        int right = picture.getRGB(x + 1, y);
+        int up = rgbMatrix[x][y-1];
+        int down = rgbMatrix[x][y+1];
+        int left = rgbMatrix[x-1][y];
+        int right = rgbMatrix[x+1][y];
 //        int r = (rgb >> 16) & 0xFF;
 //        int g = (rgb >>  8) & 0xFF;
-//        int b = (rgb >>  0) & 0xFF;
+//        int b = (rgb >>  0) & 0xFF; // rgb & 0xFF;
         double dVertical = Math.pow((up >> 16) & 0xFF - (down >> 16) & 0xFF, 2)
                 + Math.pow((up >> 8) & 0xFF - (down >> 8) & 0xFF, 2)
                 + Math.pow((up) & 0xFF - (down) & 0xFF, 2);
@@ -193,8 +193,7 @@ public class SeamCarver {
             pre = i;
         }
 
-        // update picture
-        // update energyMatrix
+        // update rgbMatrix, energyMatrix, and height
     }
 
     // remove vertical seam from current picture
@@ -214,8 +213,8 @@ public class SeamCarver {
             pre = i;
         }
 
-        // update picture
-        // update energyMatrix
+        // System.arraycopy();
+        // update rgbMatrix, energyMatrix, and width
     }
 
     //  unit testing (optional)
