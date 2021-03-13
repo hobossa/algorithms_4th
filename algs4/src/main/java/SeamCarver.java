@@ -116,9 +116,10 @@ public class SeamCarver {
 
         double minEnergy = Double.POSITIVE_INFINITY;
         int last = -1;
-        for (int j = 1; j < height() - 1; j++) {
+        for (int j = 0; j < height(); j++) {
             if (totalEng[width() - 1][j] < minEnergy) {
                 last = j;
+                minEnergy = totalEng[width() - 1][j];
             }
         }
 
@@ -151,12 +152,12 @@ public class SeamCarver {
             // we do not need to consider the first col and the last col,
             // because the energy of these item is pretty big（1000）
             // so the index is [1,width-2]
-            for (int i = 1; i < width() - 1; i++) {
+            for (int i = 0; i < width(); i++) {
                 int min = i;
-                if (totalEng[i - 1][j - 1] < totalEng[min][j - 1]) {
+                if (i - 1 >= 0 && totalEng[i - 1][j - 1] < totalEng[min][j - 1]) {
                     min = i - 1;
                 }
-                if (totalEng[i + 1][j - 1] < totalEng[min][j - 1]) {
+                if (i + 1 < width() && totalEng[i + 1][j - 1] < totalEng[min][j - 1]) {
                     min = i + 1;
                 }
                 totalEng[i][j] = totalEng[min][j - 1] + energy(i, j);
@@ -166,9 +167,10 @@ public class SeamCarver {
 
         double minEnergy = Double.POSITIVE_INFINITY;
         int last = -1;
-        for (int i = 1; i < width() - 1; i++) {
+        for (int i = 0; i < width(); i++) {
             if (totalEng[i][height() - 1] < minEnergy) {
                 last = i;
+                minEnergy = totalEng[i][height() - 1];
             }
         }
 
@@ -367,5 +369,11 @@ public class SeamCarver {
                 StdOut.printf("%9.0f ", sc.energy(col, row));
             StdOut.println();
         }
+
+        int[] vS = sc.findVerticalSeam();
+        for (int n : vS) {
+            StdOut.printf("%d    ", n);
+        }
+        StdOut.println();
     }
 }
