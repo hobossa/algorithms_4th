@@ -102,9 +102,9 @@ public class SeamCarver {
             // because the energy of these item is pretty big（1000）
             // so the index is [1,width-2]
             for (int j = 1; j < height() - 1; j++) {
-                int min = j - 1;
-                if (totalEng[i - 1][j] < totalEng[i - 1][min]) {
-                    min = j;
+                int min = j;
+                if (totalEng[i - 1][j - 1] < totalEng[i - 1][min]) {
+                    min = j - 1;
                 }
                 if (totalEng[i - 1][j + 1] < totalEng[i - 1][min]) {
                     min = j + 1;
@@ -152,9 +152,9 @@ public class SeamCarver {
             // because the energy of these item is pretty big（1000）
             // so the index is [1,width-2]
             for (int i = 1; i < width() - 1; i++) {
-                int min = i - 1;
-                if (totalEng[i][j - 1] < totalEng[min][j - 1]) {
-                    min = i;
+                int min = i;
+                if (totalEng[i - 1][j - 1] < totalEng[min][j - 1]) {
+                    min = i - 1;
                 }
                 if (totalEng[i + 1][j - 1] < totalEng[min][j - 1]) {
                     min = i + 1;
@@ -338,7 +338,7 @@ public class SeamCarver {
         return Math.sqrt(dVertical + dHorizontal);
     }
 
-//    int r = (rgb >> 16) & 0xFF;
+    //    int r = (rgb >> 16) & 0xFF;
 //    int g = (rgb >>  8) & 0xFF;
 //    int b = (rgb >>  0) & 0xFF; // rgb & 0xFF;
     private int getRed(int rgb) {
@@ -346,7 +346,7 @@ public class SeamCarver {
     }
 
     private int getGreen(int rgb) {
-        return (rgb >>  8) & 0xFF;
+        return (rgb >> 8) & 0xFF;
     }
 
     private int getBlue(int rgb) {
