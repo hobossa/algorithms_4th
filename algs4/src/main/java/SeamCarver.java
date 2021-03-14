@@ -186,7 +186,7 @@ public class SeamCarver {
 
     // remove horizontal seam from current picture
     public void removeHorizontalSeam(int[] seam) {
-        if (null == seam || width() < 2 || seam.length != width()) {
+        if (null == seam || height() < 2 || seam.length != width()) {
             throw new IllegalArgumentException();
         }
         // check seam
@@ -228,7 +228,7 @@ public class SeamCarver {
 
     // remove vertical seam from current picture
     public void removeVerticalSeam(int[] seam) {
-        if (null == seam || height() < 2 || seam.length != height()) {
+        if (null == seam || width() < 2 || seam.length != height()) {
             throw new IllegalArgumentException();
         }
         // check seam
@@ -359,7 +359,7 @@ public class SeamCarver {
 
     //  unit testing (optional)
     public static void main(String[] args) {
-        Picture picture = new Picture("6x5.png");
+        Picture picture = new Picture("8x1.png");
         StdOut.printf("image is %d pixels wide by %d pixels high.\n", picture.width(), picture.height());
 
         SeamCarver sc = new SeamCarver(picture);
@@ -374,12 +374,12 @@ public class SeamCarver {
 
         StdOut.println();
         //int[] seam = sc.findVerticalSeam();
-        int[] seam = {5,5,5,5,5};
+        int[] seam = {0};
         for (int n : seam) {
             StdOut.printf("%9d ", n);
         }
         sc.removeVerticalSeam(seam);
-        sc.picture().save("5x5.png");
+        sc.picture().save("7x1.png");
         StdOut.println();
     }
 }
