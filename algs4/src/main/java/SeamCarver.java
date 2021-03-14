@@ -192,7 +192,7 @@ public class SeamCarver {
         // check seam
         int pre = -1;
         for (int i : seam) {
-            if (i < 0 || i > width() - 1) {
+            if (i < 0 || i > height() - 1) {
                 throw new IllegalArgumentException();
             }
             if (pre != -1 && Math.abs(pre - i) > 1) {
@@ -217,7 +217,9 @@ public class SeamCarver {
         // recalculate energy of some items.
         for (int i = 0; i < len; i++) {
             // reCalculate energy of (i, seam[i]-1) and (i, seam[i])
-            setEnergy(i, seam[i] - 1, calculateEnergy(i, seam[i] - 1));
+            if (seam[i] - 1 >= 0) {
+                setEnergy(i, seam[i] - 1, calculateEnergy(i, seam[i] - 1));
+            }
             setEnergy(i, seam[i], calculateEnergy(i, seam[i]));
         }
 
@@ -232,7 +234,7 @@ public class SeamCarver {
         // check seam
         int pre = -1;
         for (int i : seam) {
-            if (i < 0 || i > height() - 1) {
+            if (i < 0 || i > width() - 1) {
                 throw new IllegalArgumentException();
             }
             if (pre != -1 && Math.abs(pre - i) > 1) {
@@ -257,7 +259,9 @@ public class SeamCarver {
         // recalculate energy of some items.
         for (int i = 0; i < len; i++) {
             // reCalculate energy of (seam[i]-1, i) and (seam[i], i)
-            setEnergy(seam[i] - 1, i, calculateEnergy(seam[i] - 1, i));
+            if (seam[i] - 1 >= 0) {
+                setEnergy(seam[i] - 1, i, calculateEnergy(seam[i] - 1, i));
+            }
             setEnergy(seam[i], i, calculateEnergy(seam[i], i));
         }
 
@@ -265,20 +269,18 @@ public class SeamCarver {
     }
 
     private static <T> void removeFromArray(int[] srcArray, int[] posToRemove) {
+        // posToRemove must be a from small to large sorted array
         int count = posToRemove.length;
-        int[] posArray = new int[count];
-        System.arraycopy(posToRemove, 0, posArray, 0, count);
-        Arrays.sort(posArray);
         for (int i = 0; i < count; i++) {
             int lenToMove;
             if (i == count - 1) {
-                lenToMove = srcArray.length - posArray[i] - 1;
+                lenToMove = srcArray.length - posToRemove[i] - 1;
             } else {
-                lenToMove = posArray[i + 1] - posArray[i];
+                lenToMove = posToRemove[i + 1] - posToRemove[i];
             }
 
-            System.arraycopy(srcArray, posArray[i] + 1,
-                    srcArray, posArray[i] - i,
+            System.arraycopy(srcArray, posToRemove[i] + 1,
+                    srcArray, posToRemove[i] - i,
                     lenToMove);
         }
     }
@@ -370,10 +372,14 @@ public class SeamCarver {
             StdOut.println();
         }
 
-        int[] vS = sc.findVerticalSeam();
-        for (int n : vS) {
-            StdOut.printf("%d    ", n);
+        StdOut.println();
+        //int[] seam = sc.findVerticalSeam();
+        int[] seam = {5,5,5,5,5};
+        for (int n : seam) {
+            StdOut.printf("%9d ", n);
         }
+        sc.removeVerticalSeam(seam);
+        sc.picture().save("5x5.png");
         StdOut.println();
     }
 }
