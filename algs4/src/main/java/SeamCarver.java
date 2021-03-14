@@ -1,9 +1,7 @@
 import edu.princeton.cs.algs4.Picture;
 import edu.princeton.cs.algs4.StdOut;
 
-import java.awt.Color;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class SeamCarver {
 
@@ -98,15 +96,12 @@ public class SeamCarver {
         }
 
         for (int i = 1; i < width(); i++) {
-            // we do not need to consider the first row and the last row,
-            // because the energy of these item is pretty big（1000）
-            // so the index is [1,width-2]
-            for (int j = 1; j < height() - 1; j++) {
+            for (int j = 0; j < height(); j++) {
                 int min = j;
-                if (totalEng[i - 1][j - 1] < totalEng[i - 1][min]) {
+                if (j - 1 >= 0 && totalEng[i - 1][j - 1] < totalEng[i - 1][min]) {
                     min = j - 1;
                 }
-                if (totalEng[i - 1][j + 1] < totalEng[i - 1][min]) {
+                if (j + 1 < height() && totalEng[i - 1][j + 1] < totalEng[i - 1][min]) {
                     min = j + 1;
                 }
                 totalEng[i][j] = totalEng[i - 1][min] + energy(i, j);
@@ -149,9 +144,6 @@ public class SeamCarver {
         }
 
         for (int j = 1; j < height(); j++) {
-            // we do not need to consider the first col and the last col,
-            // because the energy of these item is pretty big（1000）
-            // so the index is [1,width-2]
             for (int i = 0; i < width(); i++) {
                 int min = i;
                 if (i - 1 >= 0 && totalEng[i - 1][j - 1] < totalEng[min][j - 1]) {
@@ -211,9 +203,10 @@ public class SeamCarver {
         Arrays.sort(posToRemove);
 
         // update rgbMatrix
-        removeFromArray(rgbMatrix, posToRemove);
+        horizontalRemove(rgbMatrix, posToRemove);
         // update energyMatrix
-        removeFromArray(energyMatrix, posToRemove);
+        horizontalRemove(energyMatrix, posToRemove);
+
         // recalculate energy of some items.
         for (int i = 0; i < len; i++) {
             // reCalculate energy of (i, seam[i]-1) and (i, seam[i])
@@ -224,6 +217,40 @@ public class SeamCarver {
         }
 
         height--;
+    }
+
+    private void horizontalRemove(int[] srcArray, int[] posToRemove) {
+        // posToRemove must be a from small to large sorted array
+        // int minLine = posToRemove[0] / width();
+        int maxLine = posToRemove[posToRemove.length - 1] / width();
+        for (int pos : posToRemove) {
+            int nMove = pos + width();
+            while (nMove < (maxLine + 1) * width) {
+                srcArray[nMove - width()] = srcArray[nMove];
+                nMove += width();
+            }
+        }
+        // move the rest part.
+        System.arraycopy(srcArray, (maxLine + 1) * width(),
+                srcArray, maxLine * width(),
+                srcArray.length - (maxLine + 1) * width());
+    }
+
+    private void horizontalRemove(double[] srcArray, int[] posToRemove) {
+        // posToRemove must be a from small to large sorted array
+        // int minLine = posToRemove[0] / width();
+        int maxLine = posToRemove[posToRemove.length - 1] / width();
+        for (int pos : posToRemove) {
+            int nMove = pos + width();
+            while (nMove < (maxLine + 1) * width) {
+                srcArray[nMove - width()] = srcArray[nMove];
+                nMove += width();
+            }
+        }
+        // move the rest part.
+        System.arraycopy(srcArray, (maxLine + 1) * width(),
+                srcArray, maxLine * width(),
+                srcArray.length - (maxLine + 1) * width());
     }
 
     // remove vertical seam from current picture
@@ -253,9 +280,9 @@ public class SeamCarver {
         // Arrays.sort(posToRemove); // for vertical seam, posToRemove is already sorted
 
         // update rgbMatrix
-        removeFromArray(rgbMatrix, posToRemove);
+        verticalRemove(rgbMatrix, posToRemove);
         // update energyMatrix
-        removeFromArray(energyMatrix, posToRemove);
+        verticalRemove(energyMatrix, posToRemove);
         // recalculate energy of some items.
         for (int i = 0; i < len; i++) {
             // reCalculate energy of (seam[i]-1, i) and (seam[i], i)
@@ -268,7 +295,7 @@ public class SeamCarver {
         width--;
     }
 
-    private static <T> void removeFromArray(int[] srcArray, int[] posToRemove) {
+    private void verticalRemove(int[] srcArray, int[] posToRemove) {
         // posToRemove must be a from small to large sorted array
         int count = posToRemove.length;
         for (int i = 0; i < count; i++) {
@@ -285,7 +312,7 @@ public class SeamCarver {
         }
     }
 
-    private static <T> void removeFromArray(double[] srcArray, int[] posToRemove) {
+    private void verticalRemove(double[] srcArray, int[] posToRemove) {
         // posToRemove must be a from small to large sorted array
         int count = posToRemove.length;
         for (int i = 0; i < count; i++) {
@@ -359,27 +386,40 @@ public class SeamCarver {
 
     //  unit testing (optional)
     public static void main(String[] args) {
-        Picture picture = new Picture("8x1.png");
+        Picture picture = new Picture("6x5.png");
         StdOut.printf("image is %d pixels wide by %d pixels high.\n", picture.width(), picture.height());
+        StdOut.println(picture.toString());
 
         SeamCarver sc = new SeamCarver(picture);
+        int[] seam = {1, 2, 1, 2, 1, 0};
+        sc.removeHorizontalSeam(seam);
+        StdOut.println(sc.picture().toString());
 
-        StdOut.printf("Printing energy calculated for each pixel.\n");
+//        StdOut.printf("Printing energy calculated for each pixel.\n");
+//
+//        for (int row = 0; row < sc.height(); row++) {
+//            for (int col = 0; col < sc.width(); col++)
+//                StdOut.printf("%9.0f ", sc.energy(col, row));
+//            StdOut.println();
+//        }
 
-        for (int row = 0; row < sc.height(); row++) {
-            for (int col = 0; col < sc.width(); col++)
-                StdOut.printf("%9.0f ", sc.energy(col, row));
-            StdOut.println();
-        }
+//        StdOut.println();
+//        int[] seam = sc.findHorizontalSeam();
+//        //int[] seam = {0};
+//        for (int n : seam) {
+//            StdOut.printf("%9d ", n);
+//        }
+//        StdOut.println();
 
-        StdOut.println();
-        //int[] seam = sc.findVerticalSeam();
-        int[] seam = {0};
-        for (int n : seam) {
-            StdOut.printf("%9d ", n);
-        }
-        sc.removeVerticalSeam(seam);
-        sc.picture().save("7x1.png");
-        StdOut.println();
+//        int[] aA = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+//        int[] tM = {0, 5, 10, 14};
+//        removeFromArray(aA, tM);
+//        for (int n : aA) {
+//            StdOut.printf("%9d ", n);
+//        }
+//        StdOut.println();
+//        sc.removeVerticalSeam(seam);
+//        sc.picture().save("7x1.png");
+//        StdOut.println();
     }
 }
