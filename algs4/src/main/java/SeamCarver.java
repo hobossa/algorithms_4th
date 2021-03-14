@@ -237,7 +237,7 @@ public class SeamCarver {
         // move the rest part.
         System.arraycopy(srcArray, (maxLine + 1) * width(),
                 srcArray, maxLine * width(),
-                srcArray.length - (maxLine + 1) * width());
+                width() * height() - (maxLine + 1) * width());
     }
 
     private void horizontalRemove(double[] srcArray, int[] posToRemove) {
@@ -254,7 +254,7 @@ public class SeamCarver {
         // move the rest part.
         System.arraycopy(srcArray, (maxLine + 1) * width(),
                 srcArray, maxLine * width(),
-                srcArray.length - (maxLine + 1) * width());
+                width() * height() - (maxLine + 1) * width());
     }
 
     // remove vertical seam from current picture
@@ -305,7 +305,7 @@ public class SeamCarver {
         for (int i = 0; i < count; i++) {
             int lenToMove;
             if (i == count - 1) {
-                lenToMove = srcArray.length - posToRemove[i] - 1;
+                lenToMove = width() * height() - posToRemove[i] - 1;
             } else {
                 lenToMove = posToRemove[i + 1] - posToRemove[i];
             }
@@ -322,7 +322,7 @@ public class SeamCarver {
         for (int i = 0; i < count; i++) {
             int lenToMove;
             if (i == count - 1) {
-                lenToMove = srcArray.length - posToRemove[i] - 1;
+                lenToMove = width() * height() - posToRemove[i] - 1;
             } else {
                 lenToMove = posToRemove[i + 1] - posToRemove[i];
             }
