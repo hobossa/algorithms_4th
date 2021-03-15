@@ -210,17 +210,35 @@ public class SeamCarver {
         horizontalRemove(rgbMatrix, posToRemove);
         // update energyMatrix
         horizontalRemove(energyMatrix, posToRemove);
+        height--;
 
         // recalculate energy of some items.
         for (int i = 0; i < len; i++) {
             // reCalculate energy of (i, seam[i]-1) and (i, seam[i])
-            if (seam[i] - 1 >= 0) {
-                setEnergy(i, seam[i] - 1, calculateEnergy(i, seam[i] - 1));
+            int min = seam[i] - 1;
+            int max = seam[i];
+            if (i - 1 >= 0) {
+                if (min > seam[i - 1]) {
+                    min = seam[i - 1];
+                }
+                if (max < seam[i - 1]) {
+                    max = seam[i - 1];
+                }
             }
-            setEnergy(i, seam[i], calculateEnergy(i, seam[i]));
+            if (i + 1 < width()) {
+                if (min > seam[i + 1]) {
+                    min = seam[i + 1];
+                }
+                if (max < seam[i + 1]) {
+                    max = seam[i + 1];
+                }
+            }
+            min = Math.max(min, 0);
+            max = Math.min(max, height()-1);
+            for (int j = min; j <= max; j++) {
+                setEnergy(i, j, calculateEnergy(i, j));
+            }
         }
-
-        height--;
     }
 
     private void horizontalRemove(int[] srcArray, int[] posToRemove) {
@@ -287,16 +305,35 @@ public class SeamCarver {
         verticalRemove(rgbMatrix, posToRemove);
         // update energyMatrix
         verticalRemove(energyMatrix, posToRemove);
-        // recalculate energy of some items.
-        for (int i = 0; i < len; i++) {
-            // reCalculate energy of (seam[i]-1, i) and (seam[i], i)
-            if (seam[i] - 1 >= 0) {
-                setEnergy(seam[i] - 1, i, calculateEnergy(seam[i] - 1, i));
-            }
-            setEnergy(seam[i], i, calculateEnergy(seam[i], i));
-        }
-
         width--;
+
+        // recalculate energy of some items.
+        for (int j = 0; j < len; j++) {
+            // reCalculate energy
+            int min = seam[j] - 1;
+            int max = seam[j];
+            if (j - 1 >= 0) {
+                if (min > seam[j - 1]) {
+                    min = seam[j - 1];
+                }
+                if (max < seam[j - 1]) {
+                    max = seam[j - 1];
+                }
+            }
+            if (j + 1 < height()) {
+                if (min > seam[j + 1]) {
+                    min = seam[j + 1];
+                }
+                if (max < seam[j + 1]) {
+                    max = seam[j + 1];
+                }
+            }
+            min = Math.max(min, 0);
+            max = Math.min(max, width()-1);
+            for (int i = min; i <= max; i++) {
+                setEnergy(i, j, calculateEnergy(i, j));
+            }
+        }
     }
 
     private void verticalRemove(int[] srcArray, int[] posToRemove) {
