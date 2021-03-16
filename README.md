@@ -11,5 +11,5 @@
     - Kd-Trees 97% (failed 2 traversal testes with the right nearest points )
 - Part 2
     - WordNet 97% (haven't check whether the input is a rooted DAG)
-    - SeamCarver 100%
+    - SeamCarver 100% (speed optimized)
     - 
