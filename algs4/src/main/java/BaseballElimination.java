@@ -4,13 +4,16 @@ import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class BaseballElimination {
     private final int numberOfTeams;
     private final String[] teamNames;
     private final HashMap<String, Integer> teams = new HashMap<>();
     private final HashMap<String, Boolean> eliminateCache = new HashMap<>();
+    private final HashMap<String, LinkedList<String>> eliminateSubSet = new HashMap<>();
     private final int[] w;
     private final int[] l;
     private final int[] r;
@@ -44,7 +47,8 @@ public class BaseballElimination {
 
     // all teams
     public Iterable<String> teams() {
-        return teams.keySet();
+        //return teams.keySet();
+        return Arrays.asList(teamNames);
     }
 
     // number of wins for given team
@@ -102,6 +106,9 @@ public class BaseballElimination {
         if (!teams.containsKey(team)) {
             throw new IllegalArgumentException("not a valid team");
         }
+        if (isEliminated(team)) {
+            return eliminateSubSet.get(team);
+        }
         return null;
     }
 
@@ -109,7 +116,7 @@ public class BaseballElimination {
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();
         strBuilder.append(numberOfTeams);
-        strBuilder.append(System.getProperty("line.separator"));
+        strBuilder.append("\n");
         for (int i = 0; i < numberOfTeams; i++) {
             strBuilder.append(teamNames[i]);
             strBuilder.append(" ");
@@ -122,24 +129,67 @@ public class BaseballElimination {
                 strBuilder.append(" ");
                 strBuilder.append(g[i][j]);
             }
-            strBuilder.append(System.getProperty("line.separator"));
+            strBuilder.append("\n");
         }
         return strBuilder.toString();
     }
 
     private boolean isTrivialEliminated(int teamIndex) {
         boolean eliminated = false;
-        int canWin = w[teamIndex] + r[teamIndex];
+        int maxWins = w[teamIndex] + r[teamIndex];
         for (int i = 0; i < numberOfTeams; i++) {
-            if (i != teamIndex && canWin < w[i]) {
+            if (i != teamIndex && maxWins < w[i]) {
                 eliminated = true;
+                LinkedList<String> temp = new LinkedList<>();
+                temp.add(teamNames[i]);
+                eliminateSubSet.put(teamNames[teamIndex], temp);
             }
         }
         return eliminated;
     }
 
     private boolean isNontrivialEliminated(int teamIndex) {
-        return false;
+        boolean bEliminated = false;
+        // number of edges (numberOfTeams-1)*(numberOfTeams-2)*3/2 + (numberOfTeams-1);
+        // number of vertices
+        int nV = 2 + (numberOfTeams - 1) * (numberOfTeams - 2) / 2 + (numberOfTeams - 1);
+        FlowNetwork flowNetwork = new FlowNetwork(nV);
+        int xW = w[teamIndex] + r[teamIndex];
+        // add edges between s and game vertices
+        int flowFromS = 0;
+        for (int i = 0; i < numberOfTeams; i++) {
+            if (i == teamIndex) {
+                continue;
+            }
+            int vTi = getTeamVertexIndex(teamIndex, i);
+            for (int j = i + 1; j < numberOfTeams; j++) {
+                if (j == teamIndex) {
+                    continue;
+                }
+                int vG = getGameVertexIndex(teamIndex, i, j);
+                int vTj = getTeamVertexIndex(teamIndex, j);
+                flowNetwork.addEdge(new FlowEdge(0, vG, g[i][j]));
+                flowFromS += g[i][j];
+                flowNetwork.addEdge(new FlowEdge(vG, vTi, Double.POSITIVE_INFINITY));
+                flowNetwork.addEdge(new FlowEdge(vG, vTj, Double.POSITIVE_INFINITY));
+            }
+            flowNetwork.addEdge(new FlowEdge(vTi, flowNetwork.V() - 1, xW - w[i]));
+
+        }
+        FordFulkerson fordFulkerson = new FordFulkerson(flowNetwork, 0, flowNetwork.V() - 1);
+        if (fordFulkerson.value() < flowFromS) {
+            bEliminated = true;
+            LinkedList<String> temp = new LinkedList<>();
+            for (int i = 0; i < this.numberOfTeams; i++) {
+                if (i != teamIndex && fordFulkerson.inCut(getTeamVertexIndex(teamIndex, i))) {
+                    temp.add(teamNames[i]);
+                }
+            }
+            eliminateSubSet.put(teamNames[teamIndex], temp);
+        } else {
+            bEliminated = false;
+        }
+        return bEliminated;
     }
 
     private int getGameVertexIndex(int x, int i, int j) {
@@ -170,65 +220,18 @@ public class BaseballElimination {
     }
 
     public static void main(String[] args) {
-
-        int x = 4;
-        BaseballElimination d = new BaseballElimination("./teams5.txt");
-        StdOut.println(d);
-        int nT = d.numberOfTeams();
-        // number of edges (nT-1)*(nT-2)*3/2 + (nT-1);
-        // number of vertices
-        int nV = 2 + (nT - 1) * (nT - 2) / 2 + (nT - 1);
-        FlowNetwork flowNetwork = new FlowNetwork(nV);
-        int xW = d.w[x] + d.r[x];
-        // add edges between s and game vertices
-        int flowFromS = 0;
-        for (int i = 0; i < nT; i++) {
-            if (i == x) {
-                continue;
-            }
-            int vTi = d.getTeamVertexIndex(x, i);
-            for (int j = i + 1; j < nT; j++) {
-                if (j == x) {
-                    continue;
+        BaseballElimination division = new BaseballElimination(args[0]);
+        //BaseballElimination division = new BaseballElimination("./teams12.txt");
+        for (String team : division.teams()) {
+            if (division.isEliminated(team)) {
+                StdOut.print(team + " is eliminated by the subset R = { ");
+                for (String t : division.certificateOfElimination(team)) {
+                    StdOut.print(t + " ");
                 }
-                int vG = d.getGameVertexIndex(x, i, j);
-                int vTj = d.getTeamVertexIndex(x, j);
-                flowNetwork.addEdge(new FlowEdge(0, vG, d.g[i][j]));
-                flowFromS += d.g[i][j];
-                flowNetwork.addEdge(new FlowEdge(vG, vTi, Double.POSITIVE_INFINITY));
-                flowNetwork.addEdge(new FlowEdge(vG, vTj, Double.POSITIVE_INFINITY));
+                StdOut.println("}");
+            } else {
+                StdOut.println(team + " is not eliminated");
             }
-            flowNetwork.addEdge(new FlowEdge(vTi,  flowNetwork.V() - 1, xW - d.w[i]));
-
         }
-        StdOut.println(flowNetwork);
-        FordFulkerson fordFulkerson = new FordFulkerson(flowNetwork, 0, flowNetwork.V()-1);
-        StdOut.println(fordFulkerson.value());
-        if (fordFulkerson.value() < flowFromS) {
-            StdOut.print("eliminated. by the sub set (");
-            for (int i = 0; i < d.numberOfTeams(); i++) {
-                if (i != x && fordFulkerson.inCut(d.getTeamVertexIndex(x, i))) {
-                    StdOut.print(d.teamNames[i]);
-                    StdOut.print(' ');
-                }
-            }
-            StdOut.println(")");
-        } else {
-            StdOut.println("not eliminated");
-        }
-
-//        BaseballElimination division = new BaseballElimination(args[0]);
-//        for (String team : division.teams()) {
-//            if (division.isEliminated(team)) {
-//                StdOut.print(team + " is eliminated by the subset R = { ");
-//                for (String t : division.certificateOfElimination(team)) {
-//                    StdOut.print(t + " ");
-//                }
-//                StdOut.println("}");
-//            }
-//            else {
-//                StdOut.println(team + " is not eliminated");
-//            }
-//        }
     }
 }
