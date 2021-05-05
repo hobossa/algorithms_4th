@@ -1,5 +1,7 @@
 # algorithms_4th
  test code for book <Algorithms 4th>
+
+ I love Tony and Annie.
  
  assignment code for https://www.coursera.org/learn/algorithms-part1/ and https://www.coursera.org/learn/algorithms-part2/
 
@@ -13,3 +15,4 @@
     - WordNet 97% (doesn't check whether the input is a rooted DAG)
     - SeamCarver 100% (speed optimized)
     - Baseball Elimination %100
+    
