@@ -13,5 +13,6 @@
 - Part 2
     - WordNet 97% (doesn't check whether the input is a rooted DAG)
     - SeamCarver 100% (speed optimized)
-    - Baseball Elimination %100
+    - Baseball Elimination 100%
+    - BoggleSolver 100%
     
