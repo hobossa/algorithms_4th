@@ -15,4 +15,5 @@
     - SeamCarver 100% (speed optimized)
     - Baseball Elimination 100%
     - BoggleSolver 100%
+    - BurrowsWheeler 99% (Timing: 152/163 tests passed)
     
