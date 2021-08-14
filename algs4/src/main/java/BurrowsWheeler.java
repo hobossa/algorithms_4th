@@ -66,13 +66,13 @@ public class BurrowsWheeler {
     // if args[0] is "-", apply Burrows-Wheeler transform
     // if args[0] is "+", apply Burrows-Wheeler inverse transform
     public static void main(String[] args) {
-//        FileInputStream is = null;
-//        try {
-//            is = new FileInputStream(new File("./testData/abra.txt.bwt"));
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        System.setIn(is);
+       // FileInputStream is = null;
+       // try {
+       //     is = new FileInputStream(new File("./testData/abra.txt.bwt"));
+       // } catch (FileNotFoundException e) {
+       //     e.printStackTrace();
+       // }
+       // System.setIn(is);
 
         if ("-".compareTo(args[0]) == 0) {
             transform();
